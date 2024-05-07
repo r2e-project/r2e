@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "r2e"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ipykernel = "^6.29.4"
+ipywidgets = "^8.1.2"
+gitpython = "^3.1.43"
+matplotlib = "^3.8.3"
+jsonlines = "^4.0.0"
+pebble = "^5.0.7"
+openpyxl = "^3.1.2"
+flask = "^3.0.2"
+tqdm = "^4.66.2"
+docker = "^7.0.0"
+black = "^24.3.0"
+coverage = "^7.4.4"
+termcolor = "^2.4.0"
+openai = "^1.16.0"
+tiktoken = "^0.6.0"
+setuptools = "^69.2.0"
+isort = "^5.13.2"
+datasets = "^2.18.0"
+seaborn = "^0.13.2"
+anthropic = "^0.21.3"
+mypy = "^1.9.0"
+pytest = "^8.1.1"
+pyright = "^1.1.357"
+rich = "^13.7.1"
+pycg = "^0.0.8"
+networkx = "^3.3"
+rpyc = "^6.0.0"
+nltk = "^3.8.1"
+fire = "^0.6.0"
+skypilot = {extras = ["gcp"], version = "^0.5.0"}
+tomlkit = "^0.12.4"
+
+[tool.poetry.group.with-gpu]
+optional = true
+
+[tool.poetry.group.with-gpu.dependencies]
+vllm = "^0.4.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
