@@ -8,7 +8,7 @@ from r2e.models.module import Module
 from r2e.models.repo import Repo
 from r2e.models.callgraph import CodeElemType
 from r2e.pat.ast.explorer import build_ast_file
-from r2e.paths import BUCKET_DIR
+from r2e.paths import R2E_BUCKET_DIR
 
 
 IncEx: typing_extensions.TypeAlias = (
@@ -111,7 +111,7 @@ def get_type_from_identifier(identifier: Identifier, repo: Repo) -> CodeElemType
     else:
         first_part = identifier.identifier.split(".")[0]
         paths_in_repo = []
-        for root, dirs, files in os.walk(f"{BUCKET_DIR}/{repo.local_repo_path}/"):
+        for root, dirs, files in os.walk(f"{R2E_BUCKET_DIR}/{repo.local_repo_path}/"):
             for file in files:
                 if file.endswith(".py"):
                     paths_in_repo.append(os.path.join(root, file))
