@@ -1,0 +1,4 @@
+bucket_dir: buckets/repoeval_bucket
+r2e_bucket_dir: buckets/r2e_bucket
+repos_dir: buckets/local_repoeval_bucket/repos
+cache_dir: cache_dir

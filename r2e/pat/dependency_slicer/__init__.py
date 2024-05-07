@@ -1,0 +1,2 @@
+from r2e.pat.dependency_slicer.slicer_main import DependencySlicer
+from r2e.pat.dependency_slicer.dependency_graph import DependencySliceUnparseEnum
