@@ -247,10 +247,9 @@ If you use R2E in your research, please cite the following paper:
 ```bibtex
 @inproceedings{
     jain2024r2e,
-    title={R2E: Turning any Github Repository into a Programming Agent Test Environment},
+    title={R2E: Turning any Github Repository into a Programming Agent Environment},
     author={Naman Jain and Manish Shetty and Tianjun Zhang and King Han and Koushik Sen and Ion Stoica},
-    booktitle={},
+    booktitle={ICML},
     year={2024},
-    url={https://openreview.net/forum?id=xsytkViOsd}
 }
 ```
