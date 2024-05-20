@@ -59,14 +59,14 @@ R2E first clones and sets up repositories locally. It supports cloning from a UR
 python r2e/repo_builder/setup_repos.py 
     --repo_url <repo_url> 
     --local_repo_path <local_repo_path> 
-    --repo_paths_urls_file <repo_paths_urls_file> 
+    --repo_urls_file <repo_urls_file> 
     --cloning_multiprocess <cloning_multiprocess>
 ```
 
 Replace:
 - <repo_url> with the URL of the repository you want to clone.
 - <local_repo_path> with the local path of the repository you want to copy.
-- <repo_paths_urls_file> with the path to a JSON file containing a list of repository URLs or local paths.
+- <repo_urls_file> with the path to a JSON file containing a list of repository URLs or local paths.
 - <cloning_multiprocess> with the number of processes you want to use for cloning or copying.
 
 > [!Note]
