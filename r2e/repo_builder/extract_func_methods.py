@@ -9,6 +9,7 @@ from r2e.repo_builder.fut_extractor.extract_repo_data import extract_repo_data
 
 
 def build_functions_and_methods(repo_args: RepoArgs):
+    EXTRACTION_DIR.mkdir(parents=True, exist_ok=True)
     extraction_path = EXTRACTION_DIR / f"{repo_args.exp_id}_extracted.json"
     if extraction_path.exists():
         if repo_args.overwrite_extracted:
