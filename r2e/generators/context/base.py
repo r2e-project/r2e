@@ -240,6 +240,6 @@ class ContextCreator:
             for method in class_node.body
             if isinstance(method, ast.FunctionDef) and method.name == method_name
         ]
-        class_node.body.append(ast.Expr(ast.Str(s="# ...")))
+        class_node.body.append(ast.Expr(ast.Str("# ...")))
 
         return ast.unparse(class_node)
