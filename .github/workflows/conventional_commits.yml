@@ -3,13 +3,14 @@ name: Conventional Commits
 on:
   pull_request:
     branches: [ main ]
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
-  build:
-    name: Conventional Commits
+  validate-pr-title:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: webiny/action-conventional-commits@v1.3.0
+      - name: PR CC Validation
+        uses:  ytanikin/PRConventionalCommits@1.1.0
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Optional, for private repositories.
+          task_types: '["feat","fix","docs","test","ci","refactor","perf","chore","revert"]'
+          add_label: 'false'
