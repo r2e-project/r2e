@@ -32,7 +32,7 @@ class DockerSimulator:
     def start_container(
         self, image_name: str, command: str, port: int, **docker_kwargs
     ):
-        self.container: Container = self.client.containers.run(     # type: ignore
+        self.container: Container = self.client.containers.run(  # type: ignore
             image_name,
             command,
             detach=True,

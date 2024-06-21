@@ -15,10 +15,10 @@ def compare_locations(instruction: dis.Instruction, node: ast.AST) -> bool:
     """
     return (
         instruction.positions is not None
-        and instruction.positions.lineno == node.lineno
-        and instruction.positions.col_offset == node.col_offset
-        and instruction.positions.end_lineno == node.end_lineno
-        and instruction.positions.end_col_offset == node.end_col_offset
+        and instruction.positions.lineno == node.lineno  # type: ignore
+        and instruction.positions.col_offset == node.col_offset  # type: ignore
+        and instruction.positions.end_lineno == node.end_lineno  # type: ignore
+        and instruction.positions.end_col_offset == node.end_col_offset  # type: ignore
     )
 
 
