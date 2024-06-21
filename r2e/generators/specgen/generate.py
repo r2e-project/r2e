@@ -15,6 +15,7 @@ class R2ESpecGenerator:
     @staticmethod
     def generate(args):
         """Generate specs for functions"""
+        R2E_BUCKET_DIR.mkdir(parents=True, exist_ok=True)
         functions = load_functions_under_test(R2E_BUCKET_DIR / args.in_file)
 
         functions = functions[:5]

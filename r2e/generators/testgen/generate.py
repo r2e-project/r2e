@@ -45,7 +45,7 @@ class R2ETestGenerator:
                     gen_date=timestamp(),
                 )
             )
-
+        TESTGEN_DIR.mkdir(parents=True, exist_ok=True)
         write_functions_under_test(futs, TESTGEN_DIR / f"{args.exp_id}_generate.json")
 
     @staticmethod
