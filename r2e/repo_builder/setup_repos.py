@@ -19,8 +19,10 @@ class SetupRepos:
         REPOS_DIR.mkdir(parents=True, exist_ok=True)
         if repo_args.repo_url:
             SetupRepos.clone_repo_from_url(repo_args.repo_url)
+
         elif repo_args.local_repo_path:
             SetupRepos.copy_repo(repo_args.local_repo_path)
+
         elif repo_args.repo_paths_file:
             with open(repo_args.repo_paths_file) as f:
                 repo_paths: list[str] = json.load(f)
@@ -31,6 +33,7 @@ class SetupRepos:
                     isinstance(x, str) for x in repo_paths
                 ), f"Expected list of strings, got {repo_paths}"
             SetupRepos.copy_repos(repo_paths, repo_args.cloning_multiprocess)
+
         elif repo_args.repo_urls_file:
             with open(repo_args.repo_urls_file) as f:
                 repo_urls: list[str] = json.load(f)
@@ -49,7 +52,7 @@ class SetupRepos:
         repo_username, repo_name = (
             repo_url.rstrip("/").removesuffix(".git").split("/")[-2:]
         )
-        local_repo_clone_path = REPOS_DIR / f"{repo_username}|{repo_name}"
+        local_repo_clone_path = REPOS_DIR / f"{repo_username}___{repo_name}"
 
         if os.path.exists(local_repo_clone_path):
             print(
@@ -66,7 +69,7 @@ class SetupRepos:
         local_repo_path = str(Path(local_repo_path).resolve())
 
         local_repo_name = local_repo_path.split("/")[-1]
-        local_repo_clone_path = REPOS_DIR / f"LOCAL|{local_repo_name}"
+        local_repo_clone_path = REPOS_DIR / f"LOCAL___{local_repo_name}"
 
         if os.path.exists(local_repo_clone_path):
             print(
