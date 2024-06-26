@@ -3,8 +3,6 @@ from datetime import datetime
 from pathlib import Path
 import yaml
 
-# TODO: FIXME! eventually, bucket_dir and r2e_bucket_dir will be merged
-
 # Load configuration from config.yaml
 
 current_dir = Path(__file__).parent
