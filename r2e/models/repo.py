@@ -27,7 +27,7 @@ class Repo(BaseModel):
         # NOTE: this is a hacky way to get the repo path
         repo_path = file_path.split(str(REPOS_DIR))[1].split("/")[1]
         try:
-            repo_org, repo_name = repo_path.split("|")
+            repo_org, repo_name = repo_path.split("___")
         except:
             repo_org = repo_path
             repo_name = repo_path

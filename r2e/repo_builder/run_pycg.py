@@ -12,7 +12,7 @@ from r2e.pat.callgraph import CallGraphGenerator, CallGraphProcessor
 def construct_pycg(repo: Repo):
     cgraph = CallGraphGenerator.construct_call_graph(repo.repo_path)
     GRAPHS_DIR.mkdir(parents=True, exist_ok=True)
-    with open(GRAPHS_DIR / f"{repo.repo_id}_cgraph.json", "w") as f:
+    with open(repo.callgraph_path, "w") as f:
         json.dump(cgraph, f, indent=4)
 
     CallGraphProcessor.remove_unresolvable_callers(repo)
@@ -24,7 +24,7 @@ def construct_pycg(repo: Repo):
 
     new_cgraph = {"graph": cgdict, "id2type": id2type}
 
-    with open(GRAPHS_DIR / f"{repo.repo_id}_cgraph.json", "w") as f:
+    with open(repo.callgraph_path, "w") as f:
         json.dump(new_cgraph, f, indent=4)
 
     return new_cgraph
