@@ -162,12 +162,14 @@ python r2e/execution/run_self_equiv.py
     --testgen_exp_id <testgen_experiment_id> 
     --execution_multiprocess <num_processes>
     --timeout_per_task <execution_timeout>
+    --image_name <docker_image_name>
 ```
 
 Replace:
 - <testgen_experiment_id> with the experiment ID (file name) of the test generation (e.g., for `r2e_generate.json`, use `r2e_generate`).
 - <num_processes> with the number of processes you want to use for execution.
 - <execution_timeout> with the timeout for each test execution.
+- <docker_image_name> with the name of the Docker image you built in step 2.2. Typically, this name will be begin with "r2e:"
 
 > [!Note]
 >

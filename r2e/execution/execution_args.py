@@ -17,3 +17,7 @@ class ExecutionArgs(BaseModel):
     timeout_per_task: int = Field(
         180, description="The timeout for the execution service in seconds"
     )
+
+    image_name: str = Field(
+      "r2e:r2e_docker_v4", description="The name of the docker image in which to run the tests"
+    )
