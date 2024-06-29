@@ -51,7 +51,6 @@ def run_fut_with_port(
 
 def run_fut_mp(args: tuple[FunctionUnderTest | MethodUnderTest, str]) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
     fut, image_name = args
-    print("image_name", image_name)
     ## TODO: selected a random port, can collide with other processes!
     port = random.randint(3000, 10000)
     output = run_fut_with_port(fut, port, image_name)
@@ -72,7 +71,6 @@ def run_self_equiv(exec_args: ExecutionArgs):
                 print(tb)
                 continue
             new_futs.append(output[2])
-            #print(f"Done processing fut@{fut.repo_id}")
     else:
 
         outputs = run_tasks_in_parallel_iter(
