@@ -14,8 +14,8 @@ from r2e.models import FunctionUnderTest, MethodUnderTest
 from r2e.utils.data import load_functions_under_test, write_functions_under_test
 
 
-def get_service(repo_id: str, port: int) -> tuple[DockerSimulator, rpyc.Connection]:
-    simulator = DockerSimulator(repo_id=repo_id, port=port)
+def get_service(repo_id: str, port: int, image_name: str) -> tuple[DockerSimulator, rpyc.Connection]:
+    simulator = DockerSimulator(repo_id=repo_id, port=port, image_name=image_name)
     try:
         conn = rpyc.connect(
             "localhost", port, keepalive=True, config={"sync_request_timeout": 180}
@@ -28,10 +28,10 @@ def get_service(repo_id: str, port: int) -> tuple[DockerSimulator, rpyc.Connecti
 
 
 def run_fut_with_port(
-    fut: FunctionUnderTest | MethodUnderTest, port: int
+    fut: FunctionUnderTest | MethodUnderTest, port: int, image_name: str
 ) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
     try:
-        simulator, conn = get_service(fut.repo_id, port)
+        simulator, conn = get_service(fut.repo_id, port, image_name)
     except Exception as e:
         print("Service error@", fut.repo_id, repr(e))
         fut.test_history.update_exec_stats({"error": repr(e)})
@@ -49,15 +49,13 @@ def run_fut_with_port(
     print(f"Error@{fut.repo_id}:\n{tb}")
     return False, tb, fut
 
-
-def run_fut_mp(args) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
-    fut: FunctionUnderTest | MethodUnderTest = args
-
+def run_fut_mp(args: tuple[FunctionUnderTest | MethodUnderTest, str]) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
+    fut, image_name = args
+    print("image_name", image_name)
     ## TODO: selected a random port, can collide with other processes!
     port = random.randint(3000, 10000)
-    output = run_fut_with_port(fut, port)
+    output = run_fut_with_port(fut, port, image_name)
     return output
-
 
 def run_self_equiv(exec_args: ExecutionArgs):
     futs = load_functions_under_test(TESTGEN_DIR / f"{exec_args.testgen_exp_id}.json")
@@ -67,18 +65,19 @@ def run_self_equiv(exec_args: ExecutionArgs):
         for fut in futs:
             port = exec_args.port
             try:
-                output = run_fut_with_port(fut, port)
+                output = run_fut_with_port(fut, port, exec_args.image_name)
             except Exception as e:
                 print(f"Error@{fut.repo_id}:\n{repr(e)}")
                 tb = traceback.format_exc()
                 print(tb)
                 continue
             new_futs.append(output[2])
+            #print(f"Done processing fut@{fut.repo_id}")
     else:
 
         outputs = run_tasks_in_parallel_iter(
             run_fut_mp,
-            futs,
+            [(i, exec_args.image_name) for i in futs],
             num_workers=exec_args.execution_multiprocess,
             timeout_per_task=exec_args.timeout_per_task,
             use_progress_bar=True,
@@ -88,7 +87,6 @@ def run_self_equiv(exec_args: ExecutionArgs):
                 new_futs.append(x.result[2]) # type: ignore
             else:
                 print(f"Error: {x.exception_tb}")
-
     write_functions_under_test(
         new_futs, TESTGEN_DIR / f"{exec_args.testgen_exp_id}_out.json"
     )

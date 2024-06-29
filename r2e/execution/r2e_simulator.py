@@ -57,12 +57,13 @@ class DockerSimulator:
                 # timeout=60,
             )
             if exit_code != 0:
-                # print(f"{command=} error", output)
+                #print(f"{command=} error", output)
                 pass
             else:
                 # print(f"{command=} started")
                 # print(output)
                 pass
+
         except Exception as e:
             # print(f"{command=}@{self.workdir=} start error", repr(e)[:20])
             self.stop_container()
