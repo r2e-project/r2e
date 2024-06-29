@@ -79,7 +79,7 @@ Relevant Code: [extract_func_methods.py](./r2e/repo_builder/extract_func_methods
 With the repos and callgraphs in place, we can now extract the functions and methods:
 
 ```bash
-python r2e/repo_builder/build_func_methods.py 
+python r2e/repo_builder/extract_func_methods.py 
     --exp_id <experiment_id> 
     --overwrite_extracted <overwrite_flag> 
     --extraction_multiprocess <num_processes>
@@ -105,7 +105,7 @@ Relevant Code: [r2e_dockerfile_builder.py](./r2e/repo_builder/docker_builder/r2e
 R2E builds and installs the repositories in a Docker image. This image is used to execute the generated tests in the next step. We first generate a dockerfile and then build the image.
 
 ```bash
-python r2e/repo_builder/docker_builder/build_func_methods.py 
+python r2e/repo_builder/docker_builder/r2e_dockerfile_builder.py 
   --install_batch_size <install_batch_size>
 ```
 

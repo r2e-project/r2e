@@ -82,7 +82,7 @@ def run_self_equiv(exec_args: ExecutionArgs):
         )
         for x in outputs:
             if x.is_success():
-                new_futs.append(x.result[2]) # type: ignore
+                new_futs.append(x.result[2])  # type: ignore
             else:
                 print(f"Error: {x.exception_tb}")
     write_functions_under_test(
