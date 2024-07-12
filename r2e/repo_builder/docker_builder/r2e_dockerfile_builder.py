@@ -28,6 +28,8 @@ def main(repo_args: RepoArgs):
     with open(
         "r2e/repo_builder/docker_builder/r2e_final_dockerfile.dockerfile", "w"
     ) as f:
+        # Print out the dockerfile path
+        print(f"\nDockerfile created at path {os.path.abspath(f.name)}")
         f.write(dockerfile)
 
 
