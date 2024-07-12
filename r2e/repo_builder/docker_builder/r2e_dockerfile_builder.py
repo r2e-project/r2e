@@ -24,6 +24,7 @@ def main(repo_args: RepoArgs):
         dockerfile += (
             f"RUN python3 parallel_installer.py {i} {i+batch_size} {batch_size}\n\n"
         )
+    dockerfile += "RUN python3 tests.py\n\n"
 
     with open(
         "r2e/repo_builder/docker_builder/r2e_final_dockerfile.dockerfile", "w"
