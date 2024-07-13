@@ -1,10 +1,10 @@
 """Python AST builder and explorer."""
 
 import ast
+from typed_ast import ast27
 from typing import Optional
 
 from r2e.pat.ast.augmenter import add_parent_info
-
 
 def build_ast(code: str, add_parents: bool = True) -> ast.Module:
     """Build an AST from a code snippet.
@@ -15,7 +15,16 @@ def build_ast(code: str, add_parents: bool = True) -> ast.Module:
     Returns:
         ast.AST: the AST
     """
-    astree = ast.parse(code)
+    try:
+        astree = ast.parse(code)
+    except:
+        try:
+            astree = ast27.parse(code)
+        except:
+            print(f"WARNING: Python3 and Python2 parsers both failed on code {code}")
+        finally:
+            #print("Had to use Python2 parser")
+            pass
     if add_parents:
         astree = add_parent_info(astree)
     return astree
