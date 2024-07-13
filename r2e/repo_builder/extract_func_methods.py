@@ -1,11 +1,27 @@
 import fire
-
+import os
+import re
 from r2e.models import Repo
 from r2e.utils.data import write_functions
 from r2e.repo_builder.repo_args import RepoArgs
 from r2e.paths import REPOS_DIR, EXTRACTION_DIR
 from r2e.multiprocess import run_tasks_in_parallel_iter
 from r2e.repo_builder.fut_extractor.extract_repo_data import extract_repo_data
+
+def remove_bom_from_file(file_path):
+    with open(file_path, 'rb') as file:
+        content = file.read()
+    if content.startswith(b'\xef\xbb\xbf'):
+        content = content[3:]
+        with open(file_path, 'wb') as file:
+            file.write(content)
+
+def remove_bom_from_directory(directory_path):
+    for root, _, files in os.walk(directory_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file_path.endswith('.py'):  
+                remove_bom_from_file(file_path)
 
 
 def build_functions_and_methods(repo_args: RepoArgs):
@@ -21,6 +37,9 @@ def build_functions_and_methods(repo_args: RepoArgs):
             return
 
     repo_dirs = list(REPOS_DIR.glob("*"))
+    for repo_dir in repo_dirs:
+        remove_bom_from_directory(str(repo_dir))  
+
     repos = [Repo.from_file_path(str(repo_dir)) for repo_dir in repo_dirs]
 
     functions = []
