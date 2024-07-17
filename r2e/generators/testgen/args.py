@@ -20,11 +20,8 @@ class TestGenArgs(LLMArgs):
         None,
         description="The input file for the test generator",
     )
+
     exp_id: str = Field(
         "temp",
         description="Experiment ID used for prefixing the generated tests file.",
-    )
-    max_tests: int = Field(
-        None,
-        description="Maximum number of tests you want to generate",
     )
