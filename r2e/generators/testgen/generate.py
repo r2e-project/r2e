@@ -28,11 +28,35 @@ class R2ETestGenerator:
     def generate(args):
         """Generate tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
+        #print(type(functions))
+        #print(len(functions))
+        #print(functions)
+        function_names = ([i.function_id.identifier.replace('main.', '') for i in functions])
+
+        if args.max_tests:
+            functions = functions[0:args.max_tests]
+
+        print(functions)
+        print(type(functions))
+        print(len(functions))
 
         tasks = R2ETestGenerator.prepare_tasks(functions)
         payloads = [task.chat_messages for task in tasks]
 
         outputs = LLMCompletions.get_llm_completions(args, payloads)
+        # If any of the words in function_names, replace them with themselves+"reference_" prepended
+        print(outputs)
+        for i in range(len(outputs)):
+            for j in range(len(function_names)):
+                #outputs[i][0] = outputs[i][0].replace(function_names[j], "reference_"+function_names[j])
+                outputs[i][0] = outputs[i][0].replace(function_names[j], "reference_"+function_names[j])
+                outputs[i][0] = outputs[i][0].replace("reference_reference_", "reference_")
+
+
+        print(outputs)
+        print(len(outputs))
+        print(type(outputs))
+
 
         results = get_generated_tests(outputs)
         futs = [create_code_under_test(func) for func in functions]
