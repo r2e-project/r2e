@@ -4,7 +4,7 @@ import re
 from r2e.models import Repo
 from r2e.utils.data import write_functions
 from r2e.repo_builder.repo_args import RepoArgs
-from r2e.paths import REPOS_DIR
+from r2e.paths import REPOS_DIR, EXTRACTION_DIR
 from r2e.multiprocess import run_tasks_in_parallel_iter
 from r2e.repo_builder.fut_extractor.extract_repo_data import extract_repo_data
 
@@ -25,33 +25,33 @@ def remove_bom_from_directory(directory_path):
 
 
 def build_functions_and_methods(repo_args: RepoArgs):
-    repo_dirs = list(REPOS_DIR.glob("dir*"))  # Get all directories starting with 'dir'
+    EXTRACTION_DIR.mkdir(parents=True, exist_ok=True)
+    extraction_path = EXTRACTION_DIR / f"{repo_args.exp_id}_extracted.json"
+    if extraction_path.exists():
+        if repo_args.overwrite_extracted:
+            print("Overwriting existing functions and methods. Interrupt to cancel!")
+        else:
+            print(
+                "Extracted file already exists. Use --overwrite_extracted to overwrite existing."
+            )
+            return
+
+    repo_dirs = list(REPOS_DIR.glob("*"))
     for repo_dir in repo_dirs:
-        extraction_dir = repo_dir / "extracted"
-        extraction_dir.mkdir(parents=True, exist_ok=True)
-        extraction_path = extraction_dir / f"{repo_dir.name}_extracted.json"
-        
-        if extraction_path.exists():
-            if repo_args.overwrite_extracted:
-                print(f"Overwriting existing functions and methods for {repo_dir.name}. Interrupt to cancel!")
-            else:
-                print(f"Extracted file for {repo_dir.name} already exists. Use --overwrite_extracted to overwrite existing.")
-                continue
-        
         remove_bom_from_directory(str(repo_dir))  
-        repos = [Repo.from_file_path(str(repo_dir))]
 
-        functions = []
-        methods = []
+    repos = [Repo.from_file_path(str(repo_dir)) for repo_dir in repo_dirs]
 
-        outputs = run_tasks_in_parallel_iter(
-            extract_repo_data,
-            repos,
-            num_workers=repo_args.extraction_multiprocess,
-            use_progress_bar=True,
-            progress_bar_desc=f"Extracting from {repo_dir.name}..",
-        )
-        
+    functions = []
+    methods = []
+
+    outputs = run_tasks_in_parallel_iter(
+        extract_repo_data,
+        repos,
+        num_workers=repo_args.extraction_multiprocess,
+        use_progress_bar=True,
+        progress_bar_desc="Extracting..",
+    )
 
     for output in outputs:
         if output.is_success():
