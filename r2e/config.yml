@@ -1,3 +1,3 @@
-r2e_bucket_dir: buckets/r2e_bucket
-repos_dir: buckets/local_repoeval_bucket/repos
+#r2e_bucket_dir: buckets/r2e_bucket
+repos_dir: repos
 cache_dir: cache_dir

@@ -45,41 +45,49 @@ class SetupRepos:
                 ), f"Expected list of strings, got {repo_urls}"
             SetupRepos.clone_repos_from_urls(repo_urls, repo_args.cloning_multiprocess)
 
-        #run_pycg(repo_args)
+        # run_pycg(repo_args)
 
     @staticmethod
     def clone_repo_from_url(repo_url: str):
+
         repo_username, repo_name = (
             repo_url.rstrip("/").removesuffix(".git").split("/")[-2:]
         )
-        local_repo_clone_path = REPOS_DIR / f"{repo_username}___{repo_name}"
+        local_repo_clone_path = REPOS_DIR / ("dir_" + repo_name)
+        local_repo_clone_path.mkdir()
+        repo_clone_path = local_repo_clone_path / f"{repo_username}___{repo_name}"
 
-        if os.path.exists(local_repo_clone_path):
+        if os.path.exists(repo_clone_path):
             print(
-                f"Repository {repo_url} already exists at {local_repo_clone_path}... skipping"
+                f"Repository {repo_url} already exists at {repo_clone_path}... skipping"
             )
             return
 
-        print(f"Cloning repository {repo_url} to {local_repo_clone_path}")
-        git.Repo.clone_from(f"{repo_url}", local_repo_clone_path)
+        print(f"Cloning repository {repo_url} to {repo_clone_path}")
+        git.Repo.clone_from(f"{repo_url}", repo_clone_path)
 
     @staticmethod
     def copy_repo(local_repo_path: str):
         # convert relative to absolute path
         local_repo_path = str(Path(local_repo_path).resolve())
 
-        local_repo_name = local_repo_path.split("/")[-1]
-        local_repo_clone_path = REPOS_DIR / f"LOCAL___{local_repo_name}"
 
-        if os.path.exists(local_repo_clone_path):
+        local_repo_name = local_repo_path.split("/")[-1]
+
+        new_dir_name = "dir_" + local_repo_name
+        local_repo_clone_path = REPOS_DIR / new_dir_name
+        local_repo_clone_path.mkdir()
+        repo_clone_path = local_repo_clone_path / f"LOCAL___{local_repo_name}"
+
+        if os.path.exists(repo_clone_path):
             print(
-                f"Repository {local_repo_path} already exists at {local_repo_clone_path}... skipping"
+                f"Repository {local_repo_path} already exists at {repo_clone_path}... skipping"
             )
             return
 
-        print(f"Copying repository {local_repo_path} to {local_repo_clone_path}")
+        print(f"Copying repository {local_repo_path} to {repo_clone_path}")
 
-        shutil.copytree(local_repo_path, local_repo_clone_path)
+        shutil.copytree(local_repo_path, repo_clone_path)
 
     @staticmethod
     def clone_repos_from_urls(repo_urls: list[str], cloning_multiprocess: int):
