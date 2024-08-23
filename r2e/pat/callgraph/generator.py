@@ -29,19 +29,20 @@ from r2e.pat.imports.transformer import ImportTransformer
 class CallGraphGenerator:
     @staticmethod
     def construct_call_graph(repo_path: str, max_iter: int = -1) -> dict:
-        repo_path = ImportTransformer.transform_repo(repo_path)
+        try:
+            repo_path = ImportTransformer.transform_repo(repo_path)
 
-        entry_points = []
-        for root, dirs, files in os.walk(repo_path):
-            for file in files:
-                if file.endswith(".py"):
-                    entry_points.append(os.path.abspath(os.path.join(root, file)))
+            entry_points = []
+            for root, dirs, files in os.walk(repo_path):
+                for file in files:
+                    if file.endswith(".py"):
+                        entry_points.append(os.path.abspath(os.path.join(root, file)))
 
-        cg_generator = CallGraphGeneratorPyCG(
-            entry_points, repo_path, max_iter, operation="call-graph"
-        )
-        cg_generator.analyze()
-        cgraph = formats.Simple(cg_generator).generate()
-
-        shutil.rmtree(repo_path)
+            cg_generator = CallGraphGeneratorPyCG(
+                entry_points, repo_path, max_iter, operation="call-graph"
+            )
+            cg_generator.analyze()
+            cgraph = formats.Simple(cg_generator).generate()
+        finally:
+            shutil.rmtree(repo_path)
         return cgraph
