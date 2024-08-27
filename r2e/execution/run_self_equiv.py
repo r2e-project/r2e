@@ -1,11 +1,14 @@
+import os
+import subprocess
 import rpyc
 import random
 import traceback
+from time import sleep
 from pathlib import Path
 
 import fire
 
-from r2e.paths import TESTGEN_DIR, EXECUTION_DIR
+from r2e.paths import REPOS_DIR, TESTGEN_DIR, EXECUTION_DIR
 from r2e.multiprocess import run_tasks_in_parallel_iter
 from r2e.execution.execution_args import ExecutionArgs
 from r2e.execution.r2e_simulator import DockerSimulator
@@ -14,17 +17,25 @@ from r2e.models import FunctionUnderTest, MethodUnderTest
 from r2e.utils.data import load_functions_under_test, write_functions_under_test
 
 
+def start_server(repo_id: str, port: int):
+    command = f"cd {REPOS_DIR}/{repo_id} && ls && . .venv/bin/activate && r2e-test-server start --port {port} &"
+    subprocess.Popen(command, shell=True)
+    print(f"left {repo_id}...")
+
+
 def get_service(repo_id: str, port: int) -> tuple[DockerSimulator, rpyc.Connection]:
-    simulator = DockerSimulator(repo_id=repo_id, port=port)
+    # simulator = DockerSimulator(repo_id=repo_id, port=port)
+    start_server(repo_id, port)
+    sleep(20)
     try:
         conn = rpyc.connect(
             "localhost", port, keepalive=True, config={"sync_request_timeout": 180}
         )
     except Exception as e:
         print(f"Connection error -- {repo_id} -- {repr(e)}")
-        simulator.stop_container()
+        # simulator.stop_container()
         raise e
-    return simulator, conn
+    return None, conn
 
 
 def run_fut_with_port(
@@ -34,18 +45,19 @@ def run_fut_with_port(
         simulator, conn = get_service(fut.repo_id, port)
     except Exception as e:
         print("Service error@", fut.repo_id, repr(e))
-        fut.test_history.update_exec_stats({"error": repr(e)})
+        # fut.test_history.update_exec_stats({"error": repr(e)})
         return False, repr(e), fut
     try:
         return self_equiv_futs([fut], conn)
     except Exception as e:
         tb = traceback.format_exc()
+        print(tb)
         pass
     finally:
-        simulator.stop_container()
+        # simulator.stop_container()
         conn.close()
 
-    fut.test_history.update_exec_stats({"error": tb})
+    # fut.test_history.update_exec_stats({"error": tb})
     print(f"Error@{fut.repo_id}:\n{tb}")
     return False, tb, fut
 
@@ -60,7 +72,11 @@ def run_fut_mp(args) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
 
 
 def run_self_equiv(exec_args: ExecutionArgs):
-    futs = load_functions_under_test(TESTGEN_DIR / f"{exec_args.testgen_exp_id}.json")
+    futs = load_functions_under_test(
+        TESTGEN_DIR / f"{exec_args.testgen_exp_id}_generate.json"
+    )
+    futs = [fut for fut in futs if os.path.exists(f"{REPOS_DIR}/{fut.repo_id}/.venv")]
+    futs = futs[:5]
 
     new_futs = []
     if exec_args.execution_multiprocess == 0:

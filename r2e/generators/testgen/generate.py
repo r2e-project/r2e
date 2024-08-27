@@ -1,8 +1,9 @@
 import ast
-import argparse
+import random
 import tiktoken
 import fire
 from tqdm import tqdm
+from collections import Counter
 
 from r2e.models import Function, Method, Context, Tests
 from r2e.models.fut import create_code_under_test
@@ -25,22 +26,22 @@ from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR, timestamp
 class R2ETestGenerator:
 
     @staticmethod
-    def generate(args):
+    def generate(args: TestGenArgs):
         """Generate tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
 
         tasks = R2ETestGenerator.prepare_tasks(functions)
         payloads = [task.chat_messages for task in tasks]
 
-        outputs = LLMCompletions.get_llm_completions(args, payloads)
+        # outputs = LLMCompletions.get_llm_completions(args, payloads)
 
-        results = get_generated_tests(outputs)
+        # results = get_generated_tests(outputs)
         futs = [create_code_under_test(func) for func in functions]
 
-        for fut, test in zip(futs, results):
+        for fut in futs:
             fut.update_history(
                 Tests(
-                    tests={"test_0": test},
+                    tests={},
                     gen_model=args.model_name,
                     gen_date=timestamp(),
                 )
@@ -91,8 +92,19 @@ class R2ETestGenerator:
         write_functions_under_test(futs, TESTGEN_DIR / f"{args.exp_id}_filter.json")
 
     @staticmethod
-    def prepare_tasks(functions) -> list[TestGenTask]:
-        context_gen_tasks = [(args.context_type, func, 6000) for func in functions]
+    def prepare_tasks(functions: list[Function | Method]) -> list[TestGenTask]:
+        random.shuffle(functions)
+        capped_functions = []
+        count_repos = Counter()
+        for func in functions:
+            if count_repos[func.repo_id] > 30:
+                continue
+            capped_functions.append(func)
+            count_repos[func.repo_id] += 1
+
+        context_gen_tasks = [
+            (args.context_type, func, 6000) for func in capped_functions
+        ]
         context_iter = run_tasks_in_parallel_iter(
             get_context_wrapper,
             context_gen_tasks,
@@ -103,7 +115,7 @@ class R2ETestGenerator:
 
         tasks = []
 
-        for func, task_result in zip(functions, context_iter):
+        for func, task_result in zip(capped_functions, context_iter):
             if task_result.is_success():
                 context = task_result.result
                 func.add_context(context)
