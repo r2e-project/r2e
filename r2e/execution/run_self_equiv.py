@@ -1,8 +1,9 @@
 import os
-import subprocess
 import rpyc
+import socket
 import random
 import traceback
+import subprocess
 from time import sleep
 from pathlib import Path
 
@@ -17,8 +18,30 @@ from r2e.models import FunctionUnderTest, MethodUnderTest
 from r2e.utils.data import load_functions_under_test, write_functions_under_test
 
 
+def find_free_ports(num_ports, start=49152, end=65535):
+    free_ports = []
+    for port in range(start, end):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind(("", port))
+                free_ports.append(port)
+                if len(free_ports) == num_ports:
+                    return free_ports
+            except OSError:
+                continue
+    raise RuntimeError(f"Could not find {num_ports} free ports in the specified range")
+
+
 def start_server(repo_id: str, port: int):
-    command = f"cd {REPOS_DIR}/{repo_id} && ls && . .venv/bin/activate && r2e-test-server start --port {port} &"
+    command = f"cd {REPOS_DIR}/{repo_id} && . .venv/bin/activate && r2e-test-server start --port {port} &"
+    subprocess.Popen(command, shell=True)
+    print(f"left {repo_id}...")
+
+
+def stop_server(repo_id: str):
+    command = (
+        f"cd {REPOS_DIR}/{repo_id} && . .venv/bin/activate && r2e-test-server stop"
+    )
     subprocess.Popen(command, shell=True)
     print(f"left {repo_id}...")
 
@@ -45,7 +68,7 @@ def run_fut_with_port(
         simulator, conn = get_service(fut.repo_id, port)
     except Exception as e:
         print("Service error@", fut.repo_id, repr(e))
-        # fut.test_history.update_exec_stats({"error": repr(e)})
+        fut.test_history.update_exec_stats({"error": repr(e)})
         return False, repr(e), fut
     try:
         return self_equiv_futs([fut], conn)
@@ -55,15 +78,18 @@ def run_fut_with_port(
         pass
     finally:
         # simulator.stop_container()
+        stop_server(fut.repo_id)
         conn.close()
 
-    # fut.test_history.update_exec_stats({"error": tb})
+    fut.test_history.update_exec_stats({"error": tb})
     print(f"Error@{fut.repo_id}:\n{tb}")
     return False, tb, fut
 
 
 def run_fut_mp(args) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
-    fut: FunctionUnderTest | MethodUnderTest = args
+    fut: FunctionUnderTest | MethodUnderTest
+    port: int
+    fut, port = args
 
     ## TODO: selected a random port, can collide with other processes!
     port = random.randint(3000, 10000)
@@ -76,12 +102,15 @@ def run_self_equiv(exec_args: ExecutionArgs):
         TESTGEN_DIR / f"{exec_args.testgen_exp_id}_generate.json"
     )
     futs = [fut for fut in futs if os.path.exists(f"{REPOS_DIR}/{fut.repo_id}/.venv")]
-    futs = futs[:5]
+    futs = futs[:100]
+
+    ports = find_free_ports(len(futs))
 
     new_futs = []
     if exec_args.execution_multiprocess == 0:
-        for fut in futs:
-            port = exec_args.port
+        for fut, port in zip(futs, ports):
+            print(fut.file_path)
+            print(fut.function_name)
             try:
                 output = run_fut_with_port(fut, port)
             except Exception as e:
@@ -91,10 +120,9 @@ def run_self_equiv(exec_args: ExecutionArgs):
                 continue
             new_futs.append(output[2])
     else:
-
         outputs = run_tasks_in_parallel_iter(
             run_fut_mp,
-            futs,
+            list(zip(futs, ports)),
             num_workers=exec_args.execution_multiprocess,
             timeout_per_task=exec_args.timeout_per_task,
             use_progress_bar=True,
@@ -105,6 +133,8 @@ def run_self_equiv(exec_args: ExecutionArgs):
             else:
                 print(f"Error: {x.exception_tb}")
 
+    print(len(new_futs))
+    print(TESTGEN_DIR / f"{exec_args.testgen_exp_id}_out.json")
     write_functions_under_test(
         new_futs, TESTGEN_DIR / f"{exec_args.testgen_exp_id}_out.json"
     )

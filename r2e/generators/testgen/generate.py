@@ -30,8 +30,18 @@ class R2ETestGenerator:
         """Generate tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
 
-        tasks = R2ETestGenerator.prepare_tasks(functions)
-        payloads = [task.chat_messages for task in tasks]
+        random.shuffle(functions)
+        capped_functions = []
+        count_repos = Counter()
+        for func in functions:
+            if count_repos[func.repo_id] > 30:
+                continue
+            capped_functions.append(func)
+            count_repos[func.repo_id] += 1
+
+        functions = capped_functions
+        # tasks = R2ETestGenerator.prepare_tasks(functions)
+        # payloads = [task.chat_messages for task in tasks]
 
         # outputs = LLMCompletions.get_llm_completions(args, payloads)
 
