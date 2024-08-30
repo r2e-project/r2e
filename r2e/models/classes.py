@@ -6,7 +6,7 @@ from r2e.models.file import File
 from r2e.models.identifier import Identifier
 from r2e.models.repo import Repo
 from r2e.models.module import Module
-from r2e.utils.models import get_module_from_identifier
+from r2e.utils.models import get_module_from_identifier, get_module_from_path
 from r2e.pat.callgraph.explorer import CallGraphExplorer
 
 
@@ -90,6 +90,18 @@ class Class(BaseModel):
     def from_id_and_repo(cls, class_id: Identifier, repo: Repo) -> "Class":
         module: Module = get_module_from_identifier(class_id, repo)
 
+        return cls(
+            class_id=class_id,
+            file=File(file_module=module),
+        )
+
+    @classmethod
+    def from_name_file_repo(
+        cls, class_name: str, local_file_path: str, repo: Repo
+    ) -> "Class":
+        module: Module = get_module_from_path(local_file_path, repo)
+        module_identifier = module.module_id.identifier
+        class_id = Identifier(identifier=module_identifier + "." + class_name)
         return cls(
             class_id=class_id,
             file=File(file_module=module),
