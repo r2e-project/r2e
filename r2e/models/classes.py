@@ -94,3 +94,15 @@ class Class(BaseModel):
             class_id=class_id,
             file=File(file_module=module),
         )
+
+    @classmethod
+    def from_name_file_repo(
+        cls, class_name: str, local_file_path: str, repo: Repo
+    ) -> "Class":
+        module: Module = get_module_from_path(local_file_path, repo)
+        module_identifier = module.module_id.identifier
+        class_id = Identifier(identifier=module_identifier + "." + class_name)
+        return cls(
+            class_id=class_id,
+            file=File(file_module=module),
+        )
