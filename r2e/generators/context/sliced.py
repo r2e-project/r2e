@@ -2,7 +2,7 @@ import io
 import ast
 import contextlib
 
-from r2e.models import Function, Method
+from r2e.models import Function, Method, Class
 from r2e.generators.context.base import ContextCreator
 from r2e.generators.context.format import ContextFormat
 from r2e.pat.dependency_slicer import DependencySlicer, DependencySliceUnparseEnum
@@ -32,6 +32,8 @@ class SlicedContextCreator(ContextCreator):
                 slicer = DependencySlicer.from_class_models(self.func_meth.parent_class)
             elif isinstance(self.func_meth, Function):
                 slicer = DependencySlicer.from_function_models(self.func_meth)
+            elif isinstance(self.func_meth, Class):
+                slicer = DependencySlicer.from_class_models(self.func_meth)
             else:
                 raise ValueError("Unknown input type")
 
