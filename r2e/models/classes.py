@@ -6,7 +6,7 @@ from r2e.models.file import File
 from r2e.models.identifier import Identifier
 from r2e.models.repo import Repo
 from r2e.models.module import Module
-from r2e.utils.models import get_module_from_identifier
+from r2e.utils.models import get_module_from_identifier, get_module_from_path
 from r2e.pat.callgraph.explorer import CallGraphExplorer
 
 
