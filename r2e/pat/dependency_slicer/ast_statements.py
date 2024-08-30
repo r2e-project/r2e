@@ -259,7 +259,10 @@ class AstStatements:
     def find_function_stmt_with_name(self, function_name: str) -> AstStatement | None:
         for stmt_obj in self.statements_list:
             stmt = stmt_obj.stmt
-            if isinstance(stmt, ast.FunctionDef) and stmt.name == function_name:
+            if (
+                isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and stmt.name == function_name
+            ):
                 return stmt_obj
         return None
 
