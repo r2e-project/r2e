@@ -164,3 +164,4 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+r2e/repo_builder/docker_builder/r2e_final_dockerfile.dockerfile

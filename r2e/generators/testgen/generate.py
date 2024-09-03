@@ -29,7 +29,7 @@ class R2ETestGenerator:
         """Generate tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
 
-        tasks = R2ETestGenerator.prepare_tasks(functions)
+        tasks = R2ETestGenerator.prepare_tasks(functions, args)
         payloads = [task.chat_messages for task in tasks]
 
         outputs = LLMCompletions.get_llm_completions(args, payloads)
@@ -91,7 +91,7 @@ class R2ETestGenerator:
         write_functions_under_test(futs, TESTGEN_DIR / f"{args.exp_id}_filter.json")
 
     @staticmethod
-    def prepare_tasks(functions) -> list[TestGenTask]:
+    def prepare_tasks(functions, args) -> list[TestGenTask]:
         context_gen_tasks = [(args.context_type, func, 6000) for func in functions]
         context_iter = run_tasks_in_parallel_iter(
             get_context_wrapper,
