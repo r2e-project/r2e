@@ -38,6 +38,10 @@ class Class(BaseModel):
         return self.file.file_module
 
     @property
+    def name(self) -> None | str:
+        return self.class_name
+
+    @property
     def id(self) -> str:
         return self.class_id.identifier
 

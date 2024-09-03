@@ -4,6 +4,7 @@ from typing import Optional
 
 from r2e.models.function import Function
 from r2e.models.method import Method
+from r2e.models.classes import Class
 from r2e.models.context import Context
 from r2e.generators.context.format import ContextFormatter, ContextFormat
 from r2e.pat.ast.transformer import (
@@ -182,7 +183,7 @@ class ContextCreator:
         """
         tree = ast.parse(code)
 
-        if isinstance(func_meth, Method):
+        if isinstance(func_meth, (Method, Class)):
             transformer = RemoveClassTransformer(tree, func_meth.class_name)  # type: ignore
         else:
             transformer = RemoveFunctionTransformer(tree, func_meth.name)  # type: ignore
