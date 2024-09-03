@@ -62,6 +62,6 @@ class Repo(BaseModel):
     @property
     def execution_repo_data(self) -> dict[str, str]:
         return {
-            "repo_id": self.repo_id,
-            "repo_path": self.repo_id,
+            "repo_id": None,
+            "repo_path": str(REPOS_DIR / self.local_repo_path),
         }

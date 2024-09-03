@@ -27,7 +27,8 @@ def find_free_ports(num_ports, start=49152, end=65535):
                 free_ports.append(port)
                 if len(free_ports) == num_ports:
                     return free_ports
-            except OSError:
+            except OSError as e:
+                print(f"Port {port} is already in use : {repr(e)}")
                 continue
     raise RuntimeError(f"Could not find {num_ports} free ports in the specified range")
 
@@ -49,13 +50,15 @@ def stop_server(repo_id: str):
 def get_service(repo_id: str, port: int) -> tuple[DockerSimulator, rpyc.Connection]:
     # simulator = DockerSimulator(repo_id=repo_id, port=port)
     start_server(repo_id, port)
-    sleep(20)
+    sleep(6)
     try:
         conn = rpyc.connect(
             "localhost", port, keepalive=True, config={"sync_request_timeout": 180}
         )
     except Exception as e:
         print(f"Connection error -- {repo_id} -- {repr(e)}")
+        stop_server(repo_id)
+        sleep(5)
         # simulator.stop_container()
         raise e
     return None, conn
@@ -78,8 +81,14 @@ def run_fut_with_port(
         pass
     finally:
         # simulator.stop_container()
-        stop_server(fut.repo_id)
-        conn.close()
+        # stop_server(fut.repo_id)
+        try:
+            service = conn.root
+            if service:
+                service.stop_server()
+        except:
+            pass
+        sleep(2)
 
     fut.test_history.update_exec_stats({"error": tb})
     print(f"Error@{fut.repo_id}:\n{tb}")
@@ -92,7 +101,6 @@ def run_fut_mp(args) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
     fut, port = args
 
     ## TODO: selected a random port, can collide with other processes!
-    port = random.randint(3000, 10000)
     output = run_fut_with_port(fut, port)
     return output
 
@@ -102,7 +110,13 @@ def run_self_equiv(exec_args: ExecutionArgs):
         TESTGEN_DIR / f"{exec_args.testgen_exp_id}_generate.json"
     )
     futs = [fut for fut in futs if os.path.exists(f"{REPOS_DIR}/{fut.repo_id}/.venv")]
-    futs = futs[:100]
+    futs = futs[:1500]
+    # futs = [
+    #     fut
+    #     for fut in futs
+    #     if "lightly/openapi_generated/swagger_client/models/prediction_task_schema_keypoint.py"
+    #     in fut.file.file_path
+    # ]
 
     ports = find_free_ports(len(futs))
 
@@ -110,7 +124,7 @@ def run_self_equiv(exec_args: ExecutionArgs):
     if exec_args.execution_multiprocess == 0:
         for fut, port in zip(futs, ports):
             print(fut.file_path)
-            print(fut.function_name)
+            print(fut.id)
             try:
                 output = run_fut_with_port(fut, port)
             except Exception as e:
