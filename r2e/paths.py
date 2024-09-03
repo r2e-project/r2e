@@ -20,6 +20,7 @@ INTERESTING_FUNCS_DIR = R2E_BUCKET_DIR / "interesting_functions"
 TESTGEN_DIR = R2E_BUCKET_DIR / "testgen"
 EXECUTION_DIR = R2E_BUCKET_DIR / "execution"
 SPECGEN_DIR = R2E_BUCKET_DIR / "specgen"
+HISTORY_DIR = R2E_BUCKET_DIR / "history"
 
 EXTRACTED_DATA_DIR = R2E_BUCKET_DIR / "extracted_data"
 

@@ -1,10 +1,8 @@
 import ast
-import argparse
-import tiktoken
 import fire
 from tqdm import tqdm
 
-from r2e.models import Function, Method, Context, Tests
+from r2e.models import Tests
 from r2e.models.fut import create_code_under_test
 
 from r2e.pat.ast.transformer import RemoveMethodsTransformer
@@ -16,10 +14,10 @@ from r2e.multiprocess import run_tasks_in_parallel_iter
 from r2e.utils.data import (
     load_functions,
     load_functions_under_test,
-    write_functions,
+    save_history,
     write_functions_under_test,
 )
-from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR, timestamp
+from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR, HISTORY_DIR, timestamp
 
 
 class R2ETestGenerator:
@@ -37,14 +35,28 @@ class R2ETestGenerator:
         results = get_generated_tests(outputs)
         futs = [create_code_under_test(func) for func in functions]
 
-        for fut, test in zip(futs, results):
-            fut.update_history(
-                Tests(
-                    tests={"test_0": test},
-                    gen_model=args.model_name,
-                    gen_date=timestamp(),
+        if args.save_history:
+            HISTORY_DIR.mkdir(parents=True, exist_ok=True) # ensure history_dir
+            for fut, test, task, output in zip(futs, results, tasks, outputs):
+                fut.update_history(
+                    Tests(
+                        tests={"test_0": test},
+                        gen_model=args.model_name,
+                        gen_date=timestamp(),
+                    )
                 )
-            )
+                # NOTE: following the implementation of get_generated_tests, only the first output during the conversation is stored
+                save_history(fut, task.chat_messages, output[0], HISTORY_DIR)
+        else:
+            for fut, test in zip(futs, results):
+                fut.update_history(
+                    Tests(
+                        tests={"test_0": test},
+                        gen_model=args.model_name,
+                        gen_date=timestamp(),
+                    )
+                )
+
         TESTGEN_DIR.mkdir(parents=True, exist_ok=True)
         write_functions_under_test(futs, TESTGEN_DIR / f"{args.exp_id}_generate.json")
 

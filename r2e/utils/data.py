@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Dict, List
 
 
 from r2e.models.function import Function
@@ -85,3 +86,8 @@ def write_codegen_problems(
     data = [prob.model_dump() for prob in codegen_problems]
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
+
+def save_history(fut: FunctionUnderTest | MethodUnderTest, query: List[Dict[str, str]], output: str, dir_path: Path):
+    with open(dir_path / (fut.repo_id + '.' + (fut.function_id.identifier if isinstance(fut, FunctionUnderTest) 
+                                         else fut.method_id.identifier) + '.json'), 'w') as f:
+        json.dump(query + [{'assistant': output}], f, indent=4)
