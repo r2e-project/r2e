@@ -17,13 +17,13 @@ from r2e.utils.data import (
     save_history,
     write_functions_under_test,
 )
-from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR, HISTORY_DIR, timestamp
+from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR, timestamp
 
 
 class R2ETestGenerator:
 
     @staticmethod
-    def generate(args):
+    def generate(args: TestGenArgs):
         """Generate tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
 
@@ -46,7 +46,7 @@ class R2ETestGenerator:
                     )
                 )
                 # NOTE: following the implementation of get_generated_tests, only the first output during the conversation is stored
-                save_history(fut, task.chat_messages, output[0], HISTORY_DIR)
+                save_history(fut, task.chat_messages, output[0], args.exp_id)
         else:
             for fut, test in zip(futs, results):
                 fut.update_history(

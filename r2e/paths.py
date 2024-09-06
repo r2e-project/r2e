@@ -3,6 +3,8 @@ from datetime import datetime
 from pathlib import Path
 import yaml
 
+DEFAULT_EXP_ID = 'default'
+
 # Load configuration from config.yaml
 
 current_dir = Path(__file__).parent
@@ -21,6 +23,9 @@ TESTGEN_DIR = R2E_BUCKET_DIR / "testgen"
 EXECUTION_DIR = R2E_BUCKET_DIR / "execution"
 SPECGEN_DIR = R2E_BUCKET_DIR / "specgen"
 HISTORY_DIR = R2E_BUCKET_DIR / "history"
+
+def history_file(test_id, exp_id = DEFAULT_EXP_ID) -> Path:
+    return R2E_BUCKET_DIR / exp_id / test_id / 'history.json'
 
 EXTRACTED_DATA_DIR = R2E_BUCKET_DIR / "extracted_data"
 
