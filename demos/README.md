@@ -24,7 +24,8 @@
 
 > [!Note]
 >
-> To simplify exploration, we have wrapped the above steps in a single script for this demo. You can run the following command to execute the above steps: `sh demos/setup.sh`
+> To simplify exploration, we have wrapped the above steps in a single script for this demo. You can run the following command to execute the above steps: 
+> `sh demos/setup.sh -u <REPO_URL> -p <LOCAL_REPO_PATH> -e <EXP_ID>`
 >
 > You can view the individual steps in the [setup.sh](/demos/setup.sh) script.
 
