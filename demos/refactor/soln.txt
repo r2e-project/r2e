@@ -1,0 +1,47 @@
+def filter_globals(globals_list: list[str]) -> list[str]:
+    """
+    Filters out builtins and magic methods from a list of globals.
+
+    :param globals_list: list[str] - The list of global names to filter.
+    :return: list[str] - The filtered list of global names.
+    """
+    print("debug(refactored code): filtering globals")
+    return [
+        g
+        for g in globals_list
+        # if g not in dir(builtins) and not (g.startswith("__") and g.endswith("__"))
+    ]
+
+
+def collect_globals(astnode: ast.AST) -> list[str]:
+    """
+    Collects globals from type annotations and the given AST node encapsulated in a fake function.
+
+    :param astnode: ast.AST - The AST node to analyze.
+    :return: list[str] - The combined list of global names.
+    """
+    print("debug(refactored code): collecting globals")
+    fake_function_node = create_fake_function(astnode)
+    type_annotation_globals = astnode_to_type_annotation_globals(astnode)
+    function_globals = get_funclass_globals(fake_function_node)
+    return type_annotation_globals + function_globals
+
+
+def find_dependency_globals(astnode: ast.AST, unique: bool = True) -> list[str]:
+    """
+    Refactored and optimized function to find all the global symbols in the AST node,
+    excluding builtins and non-dependency globals.
+
+    :param astnode: ast.AST - The AST node to analyze.
+    :param unique: bool - Whether to return only unique symbol names.
+    :return: list[str] - List of global symbols.
+    """
+    print("debug(refactored code): finding dependency globals")
+    # Collect globals from the AST node.
+    combined_globals = collect_globals(astnode)
+
+    # Filter out builtins and magic methods.
+    filtered_globals = filter_globals(combined_globals)
+
+    # Return unique globals if requested.
+    return list(set(filtered_globals)) if unique else filtered_globals
