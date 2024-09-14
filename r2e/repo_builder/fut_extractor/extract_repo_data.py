@@ -11,7 +11,7 @@ MAX_LINES_METHOD = 20
 
 
 def extract_repo_data(args) -> tuple[list[Function], list[Method]]:
-    repo, repo_args = args  # type: Repo, RepoArgs
+    repo, repo_args = args
     functions: list[Function] = []
     methods: list[Method] = []
     no_filter = repo_args.disable_lines_filter or repo_args.disable_all_filters
