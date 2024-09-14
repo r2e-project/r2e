@@ -16,8 +16,6 @@ def extract_repo_data(args) -> tuple[list[Function], list[Method]]:
     methods: list[Method] = []
     no_filter = repo_args.disable_lines_filter or repo_args.disable_all_filters
 
-    print("SHOULD I FILTER ON LINES:", filter_lines)
-
     for file_path in repo.list_repo_files():
         if not file_path.endswith(".py"):
             continue
