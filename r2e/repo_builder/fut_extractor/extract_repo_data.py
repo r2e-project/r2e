@@ -2,6 +2,7 @@ import ast
 
 from r2e.pat.ast import build_ast_file
 from r2e.models import Identifier, Repo, File, Function, Method
+from r2e.repo_builder.repo_args import RepoArgs
 from r2e.repo_builder.fut_extractor.extract_methods import FileMethodExtractor
 from r2e.repo_builder.fut_extractor.extract_functions import FileFunctionExtractor
 
@@ -9,13 +10,18 @@ MAX_LINES_FUNCTION = 25
 MAX_LINES_METHOD = 20
 
 
-def extract_repo_data(repo: Repo) -> tuple[list[Function], list[Method]]:
+def extract_repo_data(args) -> tuple[list[Function], list[Method]]:
+    repo, repo_args = args  # type: Repo, RepoArgs
     functions: list[Function] = []
     methods: list[Method] = []
+    no_filter = repo_args.disable_lines_filter or repo_args.disable_all_filters
+
+    print("SHOULD I FILTER ON LINES:", filter_lines)
 
     for file_path in repo.list_repo_files():
         if not file_path.endswith(".py"):
             continue
+
         ## hidden file or hidden directory ignore
         file_path_split = file_path.split("/")
         if any([part.startswith(".") for part in file_path_split]):
@@ -25,7 +31,10 @@ def extract_repo_data(repo: Repo) -> tuple[list[Function], list[Method]]:
         except Exception as e:
             print(f"Error parsing {file_path}: {e}")
             continue
-        function_asts = FileFunctionExtractor.extract_functions_from_ast(astree)
+
+        function_asts = FileFunctionExtractor.extract_functions_from_ast(
+            astree, repo_args
+        )
         file_obj = File.from_file_path(file_path, repo)
         for function_ast in function_asts:
             function_name = function_ast.name
@@ -40,14 +49,14 @@ def extract_repo_data(repo: Repo) -> tuple[list[Function], list[Method]]:
                 context=None,
             )
 
-            if func_obj.num_code_lines < MAX_LINES_FUNCTION:
+            if no_filter and func_obj.num_code_lines < MAX_LINES_FUNCTION:
                 try:
                     if func_obj.callee_count:
                         functions.append(func_obj)
                 except Exception as e:  ## if callee_count is not present
                     functions.append(func_obj)
 
-        method_asts = FileMethodExtractor.extract_methods_from_ast(astree)
+        method_asts = FileMethodExtractor.extract_methods_from_ast(astree, repo_args)
         for method_ast in method_asts:
             method_name = method_ast.name
             parent_class_ast = method_ast.parent  # type: ignore
@@ -64,7 +73,7 @@ def extract_repo_data(repo: Repo) -> tuple[list[Function], list[Method]]:
                 ),
                 context=None,
             )
-            if method_obj.num_code_lines < MAX_LINES_METHOD:
+            if no_filter and method_obj.num_code_lines < MAX_LINES_METHOD:
                 try:
                     if method_obj.callee_count:
                         methods.append(method_obj)
