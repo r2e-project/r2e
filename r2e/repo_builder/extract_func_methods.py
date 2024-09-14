@@ -21,7 +21,7 @@ def build_functions_and_methods(repo_args: RepoArgs):
             return
 
     repo_dirs = list(REPOS_DIR.glob("*"))
-    repos = [Repo.from_file_path(str(repo_dir)) for repo_dir in repo_dirs]
+    repos = [(Repo.from_file_path(str(repo_dir)), repo_args) for repo_dir in repo_dirs]
 
     functions = []
     methods = []

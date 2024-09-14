@@ -81,7 +81,7 @@ class CaptureArgsInstrumenter(Instrumenter):
 
         serialized_obj = Serializers.serialize_default(obj)
 
-        if isinstance(serialized_obj, Iterable) and len(serialized_obj) > 180:
+        if isinstance(serialized_obj, Iterable) and len(serialized_obj) > 180:  # type: ignore
             return serialized_obj[:90] + "  ......  " + serialized_obj[-90:]  # type: ignore
 
         return serialized_obj

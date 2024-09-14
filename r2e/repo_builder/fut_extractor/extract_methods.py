@@ -1,38 +1,45 @@
 import ast
 
 from r2e.pat.ast import build_ast_file
+from r2e.repo_builder.repo_args import RepoArgs
 from r2e.repo_builder.fut_extractor.extract_base import FileBaseExtractor
 
 
 class FileMethodExtractor(FileBaseExtractor):
 
     @staticmethod
-    def extract_methods_from_ast(astree: ast.Module) -> list[ast.FunctionDef]:
+    def extract_methods_from_ast(
+        astree: ast.Module, repo_args: RepoArgs
+    ) -> list[ast.FunctionDef]:
         method_asts = FileMethodExtractor.get_methods_from_ast(astree)
 
+        if not repo_args.disable_all_filters:
+            return method_asts
+
         ## remove dunder methods
-        method_asts = FileMethodExtractor.filter_dunder_methods(method_asts)
+        if not repo_args.disable_dunder_methods:
+            method_asts = FileMethodExtractor.filter_dunder_methods(method_asts)
 
         ## remove methods without docstrings
-        method_asts = FileMethodExtractor.filter_keep_docstring(method_asts)
+        if not repo_args.disable_no_docstring:
+            method_asts = FileMethodExtractor.filter_keep_docstring(method_asts)
 
         ## remove methods with literal returns
-        method_asts = FileMethodExtractor.filter_literal_returns(method_asts)
+        if not repo_args.disable_signature_filters:
+            method_asts = FileMethodExtractor.filter_literal_returns(method_asts)
 
-        ## has_decorator
-        method_asts = FileMethodExtractor.filter_with_decorator(
-            method_asts, allowed_decorators=["staticmethod", "classmethod"]
-        )
+        ## keyword filters and bad function names
+        if not repo_args.disable_keyword_filters:
+            method_asts = FileMethodExtractor.filter_docstring_keywords(method_asts)
+            method_asts = FileMethodExtractor.filter_func_body_keywords(method_asts)
+            method_asts = FileMethodExtractor.filter_bad_function_names(method_asts)
 
-        ## keyword filters
-        method_asts = FileMethodExtractor.filter_docstring_keywords(method_asts)
-        method_asts = FileMethodExtractor.filter_func_body_keywords(method_asts)
-
-        ## remove methods with bad function names
-        method_asts = FileMethodExtractor.filter_bad_function_names(method_asts)
-
-        ## remove wrapper methods
-        method_asts = FileMethodExtractor.filter_wrapper_methods(method_asts)
+        ## remove wrapper and decorated methods
+        if not repo_args.disable_wrapper_filters:
+            method_asts = FileMethodExtractor.filter_with_decorator(
+                method_asts, allowed_decorators=["staticmethod", "classmethod"]
+            )
+            method_asts = FileMethodExtractor.filter_wrapper_methods(method_asts)
 
         return method_asts
 

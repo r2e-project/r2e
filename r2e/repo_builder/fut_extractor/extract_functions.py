@@ -1,41 +1,52 @@
 import ast
 
+from r2e.repo_builder.repo_args import RepoArgs
 from r2e.repo_builder.fut_extractor.extract_base import FileBaseExtractor
 
 
 class FileFunctionExtractor(FileBaseExtractor):
 
     @staticmethod
-    def extract_functions_from_ast(astree: ast.Module) -> list[ast.FunctionDef]:
+    def extract_functions_from_ast(
+        astree: ast.Module, repo_args: RepoArgs
+    ) -> list[ast.FunctionDef]:
         function_asts = FileFunctionExtractor.get_functions_from_ast(astree)
 
+        if not repo_args.disable_all_filters:
+            return function_asts
+
         ## remove dunder methods
-        function_asts = FileFunctionExtractor.filter_dunder_methods(function_asts)
+        if not repo_args.disable_dunder_methods:
+            function_asts = FileFunctionExtractor.filter_dunder_methods(function_asts)
 
         ## remove functions without docstrings
-        function_asts = FileFunctionExtractor.filter_keep_docstring(function_asts)
+        if not repo_args.disable_no_docstring:
+            function_asts = FileFunctionExtractor.filter_keep_docstring(function_asts)
 
-        ## remove functions without arguments
-        function_asts = FileFunctionExtractor.filter_nonzero_arguments(function_asts)
+        ## remove functions without arguments, returns | with literal returns
+        if not repo_args.disable_signature_filters:
+            function_asts = FileFunctionExtractor.filter_nonzero_arguments(
+                function_asts
+            )
+            function_asts = FileFunctionExtractor.filter_nonzero_returns(function_asts)
+            function_asts = FileFunctionExtractor.filter_literal_returns(function_asts)
 
-        ## remove functions without returns
-        function_asts = FileFunctionExtractor.filter_nonzero_returns(function_asts)
+        ## keyword filters and bad function names
+        if not repo_args.disable_keyword_filters:
+            function_asts = FileFunctionExtractor.filter_docstring_keywords(
+                function_asts
+            )
+            function_asts = FileFunctionExtractor.filter_func_body_keywords(
+                function_asts
+            )
+            function_asts = FileFunctionExtractor.filter_bad_function_names(
+                function_asts
+            )
 
-        ## remove functions with literal returns
-        function_asts = FileFunctionExtractor.filter_literal_returns(function_asts)
-
-        ## has_decorator
-        function_asts = FileFunctionExtractor.filter_with_decorator(function_asts)
-
-        ## keyword filters
-        function_asts = FileFunctionExtractor.filter_docstring_keywords(function_asts)
-        function_asts = FileFunctionExtractor.filter_func_body_keywords(function_asts)
-
-        ## remove functions with bad function names
-        function_asts = FileFunctionExtractor.filter_bad_function_names(function_asts)
-
-        ## remove wrapper methods
-        function_asts = FileFunctionExtractor.filter_onlt_one_stmt(function_asts)
+        ## remove wrapper and decorated methods
+        if not repo_args.disable_wrapper_filters:
+            function_asts = FileFunctionExtractor.filter_with_decorator(function_asts)
+            function_asts = FileFunctionExtractor.filter_onlt_one_stmt(function_asts)
 
         return function_asts
 

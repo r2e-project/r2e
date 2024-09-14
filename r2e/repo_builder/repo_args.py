@@ -57,3 +57,39 @@ class RepoArgs(BaseModel):
         16,
         description="Number of processes to use for extracting functions and methods",
     )
+
+    ## extraction filter disable args (use to disable filters)
+    disable_dunder_methods: bool = Field(
+        True,
+        description="Disable dunder method filter",
+    )
+
+    disable_no_docstring: bool = Field(
+        True,
+        description="Disable functions w/o docstring filter",
+    )
+
+    disable_signature_filters: bool = Field(
+        True,
+        description="Disable function signature filters (args, returns)",
+    )
+
+    disable_keyword_filters: bool = Field(
+        True,
+        description="Disable keyword filters (docstring, body, name)",
+    )
+
+    disable_wrapper_filters: bool = Field(
+        True,
+        description="Disable filters for wrappers (decorators, etc.)",
+    )
+
+    disable_lines_filter: bool = Field(
+        True,
+        description="Disable lines filter",
+    )
+
+    disable_all_filters: bool = Field(
+        True,
+        description="Disable all filters",
+    )
