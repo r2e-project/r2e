@@ -17,7 +17,7 @@ from r2e.utils.data import (
     save_history,
     write_functions_under_test,
 )
-from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR, timestamp
+from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR, HISTORY_DIR, timestamp
 
 
 class R2ETestGenerator:
