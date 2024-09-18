@@ -14,8 +14,10 @@ from r2e.models import FunctionUnderTest, MethodUnderTest
 from r2e.utils.data import load_functions_under_test, write_functions_under_test
 
 
-def get_service(repo_id: str, port: int) -> tuple[DockerSimulator, rpyc.Connection]:
-    simulator = DockerSimulator(repo_id=repo_id, port=port)
+def get_service(repo_id: str, port: int, exp_id: str) -> tuple[DockerSimulator, rpyc.Connection]:
+    simulator = DockerSimulator(repo_id=repo_id, 
+                                port=port,
+                                image_name=f"r2e:{exp_id}")
     try:
         conn = rpyc.connect(
             "localhost", port, keepalive=True, config={"sync_request_timeout": 180}
@@ -28,19 +30,19 @@ def get_service(repo_id: str, port: int) -> tuple[DockerSimulator, rpyc.Connecti
 
 
 def run_fut_with_port(
-    fut: FunctionUnderTest | MethodUnderTest, port: int
+    fut: FunctionUnderTest | MethodUnderTest, port: int, args: ExecutionArgs
 ) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
     try:
-        simulator, conn = get_service(fut.repo_id, port)
-    except Exception as e:
-        print("Service error@", fut.repo_id, repr(e))
-        fut.test_history.update_exec_stats({"error": repr(e)})
-        return False, repr(e), fut
+        simulator, conn = get_service(fut.repo_id, port, args.testgen_exp_id)
+    except Exception:
+        exception = traceback.format_exc()
+        print(f"Service error@{fut.repo_id}:\n{exception}")
+        fut.test_history.update_exec_stats({"error": exception})
+        return False, exception, fut
     try:
         return self_equiv_futs([fut], conn)
-    except Exception as e:
+    except Exception:
         tb = traceback.format_exc()
-        pass
     finally:
         simulator.stop_container()
         conn.close()
@@ -50,12 +52,11 @@ def run_fut_with_port(
     return False, tb, fut
 
 
-def run_fut_mp(args) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
-    fut: FunctionUnderTest | MethodUnderTest = args
+def run_fut_mp(fut: FunctionUnderTest | MethodUnderTest, args: ExecutionArgs) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
 
-    ## TODO: selected a random port, can collide with other processes!
+    # TODO: selected a random port, can collide with other processes!
     port = random.randint(3000, 10000)
-    output = run_fut_with_port(fut, port)
+    output = run_fut_with_port(fut, port, args)
     return output
 
 
@@ -67,7 +68,7 @@ def run_self_equiv(exec_args: ExecutionArgs):
         for fut in futs:
             port = exec_args.port
             try:
-                output = run_fut_with_port(fut, port)
+                output = run_fut_with_port(fut, port, exec_args)
             except Exception as e:
                 print(f"Error@{fut.repo_id}:\n{repr(e)}")
                 tb = traceback.format_exc()
@@ -78,7 +79,7 @@ def run_self_equiv(exec_args: ExecutionArgs):
 
         outputs = run_tasks_in_parallel_iter(
             run_fut_mp,
-            futs,
+            [futs, exec_args],
             num_workers=exec_args.execution_multiprocess,
             timeout_per_task=exec_args.timeout_per_task,
             use_progress_bar=True,

@@ -2,8 +2,10 @@
 
 import json
 from pathlib import Path
+from typing import Dict, List
 
 
+from r2e.paths import history_file, DEFAULT_EXP_ID
 from r2e.models.function import Function
 from r2e.models.method import Method
 from r2e.models.fut import FunctionUnderTest, MethodUnderTest
@@ -85,3 +87,9 @@ def write_codegen_problems(
     data = [prob.model_dump() for prob in codegen_problems]
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
+
+def save_history(fut: FunctionUnderTest | MethodUnderTest, query: List[Dict[str, str]], 
+                 output: str, exp_id: str = DEFAULT_EXP_ID):
+    test_id = fut.function_id.identifier if isinstance(fut, FunctionUnderTest) else fut.method_id.identifier
+    with open(history_file(test_id, exp_id), 'w') as f:
+        json.dump(query + [{'assistant': output}], f, indent=4)

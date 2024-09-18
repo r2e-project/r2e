@@ -7,10 +7,12 @@ class TestGenArgs(LLMArgs):
         "sliced",
         description="The context type to use for the language model",
     )
+
     oversample_rounds: int = Field(
         1,
         description="The number of rounds to oversample",
     )
+
     max_context_size: int = Field(
         6000,
         description="The maximum context size",
@@ -24,4 +26,9 @@ class TestGenArgs(LLMArgs):
     exp_id: str = Field(
         "temp",
         description="Experiment ID used for prefixing the generated tests file.",
+    )
+
+    save_history: bool = Field(
+        False,
+        description="Whether to save the whole LLM conversation history.",
     )

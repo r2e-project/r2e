@@ -57,8 +57,7 @@ class DockerSimulator:
                 # timeout=60,
             )
             if exit_code != 0:
-                # print(f"{command=} error", output)
-                pass
+                print(f"{command=} error:", output)
             else:
                 # print(f"{command=} started")
                 # print(output)
