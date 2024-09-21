@@ -30,6 +30,19 @@ def extract_repo_data(args) -> tuple[list[Function], list[Method]]:
             print(f"Error parsing {file_path}: {e}")
             continue
 
+        ## ignore test files
+        if any(
+            [
+                part.lower().startswith("test") or part.lower().endswith("_test.py")
+                for part in file_path_split
+            ]
+        ):
+            continue
+
+        ## ignore ci files: setup.py, conftest.py
+        if any([file_path.endswith(f) for f in ["setup.py", "conftest.py"]]):
+            continue
+
         function_asts = FileFunctionExtractor.extract_functions_from_ast(
             astree, repo_args
         )
