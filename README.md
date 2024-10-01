@@ -68,18 +68,14 @@ R2E can be used **locally** or with **Docker** for full functionality.
 1. [Quickstart (Local)](docs/quickstart.md)
   
     For a quick start guide to using R2E locally, see our [Quickstart Guide](docs/quickstart.md).
-    > [!Note]
-    >
-    > We recommend this method for quick exploration and small-scale experiments on your local machine. Warning: this will execute unstrustured LLM generated code without sandboxing.
-
 
 2. [Full Usage (Docker)](docs/fullguide.md)
   
     For comprehensive instructions on using R2E with Docker for full functionality, see our [Full Guide](docs/fullguide.md).
 
-    > [!Note]
-    >
-    > We recommend this method for large-scale experiments and reproducibility and sandboxed execution of arbitrary unstrusted code.
+> [!Note]
+>
+> We recommend the Docker-based usage for full functionality and safety when working with unknown repositories. Use the local setup for quick exploration and testing at your own risk.
 
 
 ## Citation
