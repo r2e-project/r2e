@@ -5,7 +5,7 @@ This guide provides comprehensive instructions for using R2E with Docker to acce
 ## Prerequisites
 
 - Docker installed and running
-- R2E repository cloned and installed (see [README](../README.md) for installation instructions)
+- R2E repository cloned and installed (see [README](../README.md#installation) for installation instructions)
 
 
 ## Converting Repositories to Environments

@@ -1,60 +1,36 @@
 # R2E Quickstart Guide (Local Usage)
 
-This guide will help you get started with R2E quickly using local execution.
+This guide will help you get started with R2E quickly using a local execution setup. You will learn how to set up R2E, generate equivalence tests, and a LLM code-generation benchmark.
 
 ## Prerequisites
 
-1. Ensure `r2e` is cloned and installed:
-   
-   ```bash
-   git clone https://github.com/r2e-project/r2e.git
-   cd r2e
-   pip install -e .  # or poetry install
+- R2E repository cloned and installed (see [README](../README.md#installation) for installation instructions)
+
+
+## Quickstart
+
+We provide an interactive Jupyter notebook as a quickstart guide to help you get started with R2E quickly. This notebook walks you through the basic workflow of R2E, including setting up a repository, generating equivalence tests, and evaluating a refactored function.
+
+To use the quickstart guide:
+
+1. Ensure you have Jupyter installed. If not, you can install it with:
+   ```
+   pip install jupyter
    ```
 
-2. Install `r2e-test-server`:
-
-   ```bash
-   pip install r2e-test-server
+2. Start Jupyter Notebook:
+   ```
+   jupyter notebook
    ```
 
-## Setup R2E and Generate Equivalence Tests
+4. Open the `quickstart.ipynb` notebook.
 
-We've simplified the setup process with a script. Run the following command:
+5. Follow the instructions in the notebook, executing each cell as you go.
 
-```bash
-sh demos/setup.sh -u <REPO_URL> -p <LOCAL_REPO_PATH> -e <EXP_ID>
-```
+This hands-on guide will give you a practical introduction to R2E's core functionality. Below is a brief overview of the steps covered in the notebook:
 
-This script performs the following steps:
-1. Sets up your local repository (clone and install)
-2. Extracts functions and methods using R2E
-3. Generates equivalence tests using R2E
-
-> [!Note]
-> You can view the individual steps in the [setup.sh](/demos/setup.sh) script.
-
-## Execute and Evaluate Tasks
-
-1. Start the r2e-test-server in a terminal:
-   ```bash
-   r2e-test-server start
-   ```
-
-2. Run the demo script for task execution (e.g., refactoring):
-   ```bash
-   python demos/refactor/refactor.py
-   ```
-
-This script demonstrates how to:
-1. Load generated equivalence tests
-2. Pick a function under test
-3. Initialize the function, tests, and repo with the server
-4. Execute tests on existing or modified code
-
-> [!Note]
-> View the [refactor.py](/demos/refactor/refactor.py) script for more details on the execution process.
+## Steps
+<!-- TODO -->
 
 ## Next Steps
-
-For more advanced usage and full functionality with Docker, please refer to our [Full Guide](full_guide.md).
+For more advanced features and detailed usage, please refer to our [Full Guide](docs/full_guide.md).
