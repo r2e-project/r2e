@@ -23,7 +23,7 @@ To use the quickstart guide:
    jupyter notebook
    ```
 
-4. Open the `quickstart.ipynb` notebook.
+4. Open the [`quickstart.ipynb`](./quickstart.ipynb) notebook.
 
 5. Follow the instructions in the notebook, executing each cell as you go.
 
