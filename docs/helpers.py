@@ -13,6 +13,9 @@ from rich.markdown import Markdown
 from rich.table import Table
 from rich.layout import Layout
 
+from r2e.utils.data import load_functions
+from r2e.paths import EXTRACTED_DATA_DIR
+
 
 console = Console()
 
