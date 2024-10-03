@@ -17,25 +17,25 @@ class FileMethodExtractor(FileBaseExtractor):
             return method_asts
 
         ## remove dunder methods
-        if repo_args.disable_dunder_methods:
+        if not repo_args.disable_dunder_methods:
             method_asts = FileMethodExtractor.filter_dunder_methods(method_asts)
 
         ## remove methods without docstrings
-        if repo_args.disable_no_docstring:
+        if not repo_args.disable_no_docstring:
             method_asts = FileMethodExtractor.filter_keep_docstring(method_asts)
 
         ## remove methods with literal returns
-        if repo_args.disable_signature_filters:
+        if not repo_args.disable_signature_filters:
             method_asts = FileMethodExtractor.filter_literal_returns(method_asts)
 
         ## keyword filters and bad function names
-        if repo_args.disable_keyword_filters:
+        if not repo_args.disable_keyword_filters:
             method_asts = FileMethodExtractor.filter_docstring_keywords(method_asts)
             method_asts = FileMethodExtractor.filter_func_body_keywords(method_asts)
             method_asts = FileMethodExtractor.filter_bad_function_names(method_asts)
 
         ## remove wrapper and decorated methods
-        if repo_args.disable_wrapper_filters:
+        if not repo_args.disable_wrapper_filters:
             method_asts = FileMethodExtractor.filter_with_decorator(
                 method_asts, allowed_decorators=["staticmethod", "classmethod"]
             )

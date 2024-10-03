@@ -16,15 +16,15 @@ class FileFunctionExtractor(FileBaseExtractor):
             return function_asts
 
         ## remove dunder methods
-        if repo_args.disable_dunder_methods:
+        if not repo_args.disable_dunder_methods:
             function_asts = FileFunctionExtractor.filter_dunder_methods(function_asts)
 
         ## remove functions without docstrings
-        if repo_args.disable_no_docstring:
+        if not repo_args.disable_no_docstring:
             function_asts = FileFunctionExtractor.filter_keep_docstring(function_asts)
 
         ## remove functions without arguments, returns | with literal returns
-        if repo_args.disable_signature_filters:
+        if not repo_args.disable_signature_filters:
             function_asts = FileFunctionExtractor.filter_nonzero_arguments(
                 function_asts
             )
@@ -32,7 +32,7 @@ class FileFunctionExtractor(FileBaseExtractor):
             function_asts = FileFunctionExtractor.filter_literal_returns(function_asts)
 
         ## keyword filters and bad function names
-        if repo_args.disable_keyword_filters:
+        if not repo_args.disable_keyword_filters:
             function_asts = FileFunctionExtractor.filter_docstring_keywords(
                 function_asts
             )
@@ -44,7 +44,7 @@ class FileFunctionExtractor(FileBaseExtractor):
             )
 
         ## remove wrapper and decorated methods
-        if repo_args.disable_wrapper_filters:
+        if not repo_args.disable_wrapper_filters:
             function_asts = FileFunctionExtractor.filter_with_decorator(function_asts)
             function_asts = FileFunctionExtractor.filter_onlt_one_stmt(function_asts)
 
