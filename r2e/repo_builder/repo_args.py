@@ -60,36 +60,36 @@ class RepoArgs(BaseModel):
 
     ## extraction filter disable args (use to disable filters)
     disable_dunder_methods: bool = Field(
-        True,
+        False,
         description="Disable dunder method filter",
     )
 
     disable_no_docstring: bool = Field(
-        True,
+        False,
         description="Disable functions w/o docstring filter",
     )
 
     disable_signature_filters: bool = Field(
-        True,
+        False,
         description="Disable function signature filters (args, returns)",
     )
 
     disable_keyword_filters: bool = Field(
-        True,
+        False,
         description="Disable keyword filters (docstring, body, name)",
     )
 
     disable_wrapper_filters: bool = Field(
-        True,
+        False,
         description="Disable filters for wrappers (decorators, etc.)",
     )
 
     disable_lines_filter: bool = Field(
-        True,
+        False,
         description="Disable lines filter",
     )
 
     disable_all_filters: bool = Field(
-        True,
+        False,
         description="Disable all filters",
     )
