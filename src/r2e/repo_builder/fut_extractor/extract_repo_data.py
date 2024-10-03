@@ -47,7 +47,7 @@ def extract_repo_data(args) -> tuple[list[Function], list[Method]]:
                 context=None,
             )
 
-            if no_filter and func_obj.num_code_lines < MAX_LINES_FUNCTION:
+            if no_filter or func_obj.num_code_lines < MAX_LINES_FUNCTION:
                 try:
                     if func_obj.callee_count:
                         functions.append(func_obj)
@@ -71,7 +71,7 @@ def extract_repo_data(args) -> tuple[list[Function], list[Method]]:
                 ),
                 context=None,
             )
-            if no_filter and method_obj.num_code_lines < MAX_LINES_METHOD:
+            if no_filter or method_obj.num_code_lines < MAX_LINES_METHOD:
                 try:
                     if method_obj.callee_count:
                         methods.append(method_obj)
