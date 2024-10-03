@@ -13,7 +13,7 @@ class FileMethodExtractor(FileBaseExtractor):
     ) -> list[ast.FunctionDef]:
         method_asts = FileMethodExtractor.get_methods_from_ast(astree)
 
-        if not repo_args.disable_all_filters:
+        if repo_args.disable_all_filters:
             return method_asts
 
         ## remove dunder methods
