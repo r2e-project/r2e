@@ -28,25 +28,32 @@ class R2ETestGenerator:
     def generate(args):
         """Generate tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
-
         tasks = R2ETestGenerator.prepare_tasks(args, functions)
+        R2ETestGenerator._generate(args, tasks, write_to_file=True)
+
+    @staticmethod
+    def _generate(args, tasks, test_id=0, write_to_file=False):
         payloads = [task.chat_messages for task in tasks]
-
         outputs = LLMCompletions.get_llm_completions(args, payloads)
-
         results = get_generated_tests(outputs)
-        futs = [create_code_under_test(func) for func in functions]
+        futs = [create_code_under_test(task.func_meth) for task in tasks]
 
         for fut, test in zip(futs, results):
             fut.update_history(
                 Tests(
-                    tests={"test_0": test},
+                    tests={f"test_{test_id}": test},
                     gen_model=args.model_name,
                     gen_date=timestamp(),
                 )
             )
-        TESTGEN_DIR.mkdir(parents=True, exist_ok=True)
-        write_functions_under_test(futs, TESTGEN_DIR / f"{args.exp_id}_generate.json")
+
+        if write_to_file:
+            TESTGEN_DIR.mkdir(parents=True, exist_ok=True)
+            write_functions_under_test(
+                futs, TESTGEN_DIR / f"{args.exp_id}_generate.json"
+            )
+
+        return futs
 
     @staticmethod
     def filter(args):
