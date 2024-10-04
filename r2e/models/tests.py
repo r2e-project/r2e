@@ -42,6 +42,20 @@ class TestHistory(BaseModel):
         return self.history[-1].exec_stats
 
     @property
+    def latest_coverage(self) -> float:
+        """Returns the coverage logs of the latest test run"""
+        if not self.is_passing:
+            return 0
+
+        last_tests = self.history[-1]
+        if last_tests.exec_stats is None:
+            return 0
+        if "coverage_logs" not in last_tests.exec_stats:
+            return 0
+
+        return last_tests.exec_stats["coverage_logs"][-1]
+
+    @property
     def is_passing(self) -> bool:
         """Returns True if the latest tests are passing"""
         if len(self.history) == 0:

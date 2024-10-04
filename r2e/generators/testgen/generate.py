@@ -29,7 +29,7 @@ class R2ETestGenerator:
         """Generate tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
 
-        tasks = R2ETestGenerator.prepare_tasks(functions)
+        tasks = R2ETestGenerator.prepare_tasks(args, functions)
         payloads = [task.chat_messages for task in tasks]
 
         outputs = LLMCompletions.get_llm_completions(args, payloads)
@@ -47,17 +47,6 @@ class R2ETestGenerator:
             )
         TESTGEN_DIR.mkdir(parents=True, exist_ok=True)
         write_functions_under_test(futs, TESTGEN_DIR / f"{args.exp_id}_generate.json")
-
-    @staticmethod
-    def execute(args):
-        """Execute the generated tests"""
-        futs = load_functions_under_test(TESTGEN_DIR / args.in_file)
-
-        # TODO: use docker client to execute tests
-        # TODO: dump the results to disk
-        # NOTE: (@manish): stats = {sample_id -> stats}; use fut.update_stats
-
-        raise NotImplementedError("Connect to docker client to execute tests")
 
     @staticmethod
     def filter(args):
@@ -91,7 +80,7 @@ class R2ETestGenerator:
         write_functions_under_test(futs, TESTGEN_DIR / f"{args.exp_id}_filter.json")
 
     @staticmethod
-    def prepare_tasks(functions) -> list[TestGenTask]:
+    def prepare_tasks(args, functions) -> list[TestGenTask]:
         context_gen_tasks = [(args.context_type, func, 6000) for func in functions]
         context_iter = run_tasks_in_parallel_iter(
             get_context_wrapper,
