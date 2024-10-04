@@ -6,10 +6,13 @@ import textwrap
 
 from r2e.repo_builder import RepoArgs, SetupRepos, build_functions_and_methods
 from r2e.generators.testgen import TestGenArgs, R2ETestGenerator
+from r2e.execution.args import ExecutionArgs
+from r2e.execution.execute import EquivalenceTestRunner
+
 from r2e.utils.data import load_functions, load_functions_under_test
 from r2e.models import *
 
-from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR
+from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR, EXECUTION_DIR
 
 @click.group()
 def r2e():
@@ -40,7 +43,16 @@ def setup(**kwargs):
 # @r2e.command()
 # def build():
 #     """Build the Docker image."""
-#     pass
+#     if local:
+#         click.echo("Please manually install repositories in the r2e environment.")
+#     else:
+#         click.echo("Creating a dockerfile...")
+#         >> python r2e_dockerfile_builder.py --instal_batch_size k (TODO: call the API)
+#         >> path_to_dockerfile = DOCKERFILE_DIR / "r2e_final_dockerfile.dockerfile"
+#         click.echo("Building the Docker image...")
+#         # warn that this will take a while; suggest to run in tmux if possible
+#         >> cd REPOS_DIR
+#         >> docker build -t r2e:<exp_id> -f path_to_dockerfile .
 
 
 ################### r2e extract ###################
@@ -65,7 +77,7 @@ def extract(**kwargs):
 
 ################### r2e generate ###################
 
-def _default_in_file(ctx, param, value):
+def _default_in_file_gen(ctx, param, value):
     if not value:
         exp_id = ctx.params.get('exp_id')
         default_file = f"{exp_id}_extracted.json"
@@ -76,7 +88,7 @@ def _default_in_file(ctx, param, value):
 
 @r2e.command()
 @click.option('--exp_id', '-e', default="temp", help="Experiment ID used for prefixing the generated tests file")
-@click.option('--in_file', '-i', callback=_default_in_file, help="The input file for the test generator. Defaults to {exp_id}_extracted.json if not provided.")
+@click.option('--in_file', '-i', callback=_default_in_file_gen, help="The input file for the test generator. Defaults to {exp_id}_extracted.json if not provided.")
 @click.option('--context_type', default="sliced", help="The context type to use for the language model")
 @click.option('--oversample_rounds', default=1, type=int, help="The number of rounds to oversample")
 @click.option('--max_context_size', default=6000, type=int, help="The maximum context size")
@@ -210,6 +222,49 @@ def show(exp_id, fname, show_code, show_test):
             click.echo(f"\n{test_name}:")
             click.echo(textwrap.indent(test_code, '    '))
 
+
+################### r2e execute ###################
+
+def _default_in_file_exec(ctx, param, value):
+    if not value:
+        exp_id = ctx.params.get('exp_id')
+        default_file = f"{exp_id}_generate.json"
+        click.echo(f"Warning: --in_file not provided. Using `{default_file}` as per `exp_id`.")
+        return default_file
+    return value
+
+@r2e.command()
+@click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
+@click.option('--in-file', '-i', callback=_default_in_file_exec, help="The input file for the test execution")
+@click.option('--local', is_flag=True, default=False, help="Whether to run the execution service locally. Default is docker.")
+@click.option('--image', default="r2e:temp", help="The name of the docker image in which to run the tests")
+@click.option('--execution-multiprocess', '-m', default=20, type=int, help="The number of processes to use for executing the functions and methods")
+@click.option('--port', default=3006, type=int, help="The port to use for the execution service. Default is 3006 for sequential execution. For parallel, port is randomly picked.")
+@click.option('--timeout-per-task', default=180, type=int, help="The timeout for the execution service to complete one task in seconds")
+@click.option('--batch-size', default=100, type=int, help="The number of functions to run before writing the output to the file")
+def execute(**kwargs):
+    """Execute the generated equivalence tests."""
+    
+    if kwargs['local']:
+        click.echo(f"Note: Running the execution service locally. Remove --local for docker.")
+        kwargs['image'] = "r2e:temp"
+    elif not kwargs['image']:
+        click.echo(f"Warning: --image not provided. Using `r2e:{kwargs['exp_id']}` as per `exp_id`.")
+        kwargs['image'] = f"r2e:{kwargs['exp_id']}"
+    elif kwargs['image'] == "r2e:temp":
+        click.echo("Warning: Using the default image `r2e:temp`. Use --image for custom image.")
+    else:
+        click.echo(f"Note: Using the provided image: {kwargs['image']}")
+    
+    testgen_file_path = os.path.join(TESTGEN_DIR, kwargs['in_file'])
+    if not os.path.exists(testgen_file_path):
+        click.echo(f"\nNo generated tests found for experiment ID: {kwargs['exp_id']}")
+        return
+        
+    args = ExecutionArgs(**kwargs)
+    EXECUTION_DIR.mkdir(parents=True, exist_ok=True)
+    EquivalenceTestRunner.run(args)
+    click.echo("Test execution completed successfully.")
 
 if __name__ == '__main__':
     r2e()
