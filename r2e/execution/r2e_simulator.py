@@ -69,35 +69,12 @@ class DockerSimulator:
         return
 
     def start_server(self, repo_id: str, port: int):
-        # self.run_single_command("pip install pipreqs")
-        # self.run_single_command(
-        #     f"pipreqs --encoding=iso-8859-1 --ignore .venv --savepath new_reqs.txt --mode no-pin ."
-        # )
-        # self.run_single_command(".venv/bin/python -m pip install -r new_reqs.txt")
-
         command = f"bash -c \
             'source .venv/bin/activate && ls && \
             r2e-test-server start --port {port} &\
             '"
 
         self.run_single_command(command)
-
-        # try:
-        #     exit_code, output = self.container.exec_run(
-        #         command,
-        #         workdir=f"/repos/{repo_id}",
-        #     )
-        #     if exit_code != 0:
-        #         pass
-        #         # print("Server start error", output)
-        #     else:
-        #         pass
-        #         # print("Server started")
-        #         # print(output)
-        # except Exception as e:
-        #     print("Server start error", repr(e))
-        #     print(command)
-        #     self.stop_container()
         return
 
     def stop_container(self):
