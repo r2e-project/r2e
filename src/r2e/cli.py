@@ -1,16 +1,22 @@
 # fmt: off
+import os
 import click
-from r2e.repo_builder.setup_repos import SetupRepos
-from r2e.repo_builder.extract_func_methods import build_functions_and_methods
+import ast
+import textwrap
 
-from r2e.repo_builder.repo_args import RepoArgs
+from r2e.repo_builder import RepoArgs, SetupRepos, build_functions_and_methods
 from r2e.generators.testgen import TestGenArgs, R2ETestGenerator
+from r2e.utils.data import load_functions, load_functions_under_test
+from r2e.models import *
+
+from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR
 
 @click.group()
 def r2e():
     """R2E CLI tool."""
     pass
 
+################### r2e setup ###################
 
 @r2e.command()
 @click.option('--repo_url', '-r', help="URL of the repository to build")
@@ -27,6 +33,8 @@ def setup(**kwargs):
     click.echo("Setup completed successfully.")
 
 
+################### r2e build ###################
+
 # TODO: r2e install/build command for docker building
 # if local mode, then suggest user to install the repo in the r2e environment
 # @r2e.command()
@@ -34,6 +42,8 @@ def setup(**kwargs):
 #     """Build the Docker image."""
 #     pass
 
+
+################### r2e extract ###################
 
 @r2e.command()
 @click.option('--exp_id', '-e', default="temp", help="Experiment ID used for prefixing the extracted functions and methods")
@@ -51,8 +61,10 @@ def extract(**kwargs):
     repo_args = RepoArgs(**kwargs)
     build_functions_and_methods(repo_args)
     click.echo("Extraction completed successfully.")
-    
-    
+
+
+################### r2e generate ###################
+
 def _default_in_file(ctx, param, value):
     if not value:
         exp_id = ctx.params.get('exp_id')
@@ -69,7 +81,7 @@ def _default_in_file(ctx, param, value):
 @click.option('--oversample_rounds', default=1, type=int, help="The number of rounds to oversample")
 @click.option('--max_context_size', default=6000, type=int, help="The maximum context size")
 # LLMArgs options
-@click.option('--multiprocess', '-m', default=1, type=int, help="The number of processes to use for multiprocessing")
+@click.option('--multiprocess', '-m', default=8, type=int, help="The number of processes to use for multiprocessing")
 @click.option('--model_name', default="gpt-4-turbo-2024-04-09", help="The model name to use for the language model")
 @click.option('--n', default=1, type=int, help="The number of completions to generate")
 @click.option('--top_p', default=0.95, type=float, help="The nucleus sampling probability")
@@ -86,6 +98,117 @@ def generate(**kwargs):
     test_gen_args = TestGenArgs(**kwargs)
     R2ETestGenerator.generate(test_gen_args)
     click.echo("Test generation completed successfully.")
+
+
+################### r2e list-functions ###################
+
+def extract_signature_and_docstring(code, max_width=100):
+    try:
+        tree = ast.parse(code)
+        function_def = tree.body[0]
+        args = [arg.arg for arg in function_def.args.args]
+        defaults = [ast.unparse(default) for default in function_def.args.defaults]
+        padded_defaults = [''] * (len(args) - len(defaults)) + defaults
+        signature = ', '.join(f'{arg}={default}' if default else arg for arg, default in zip(args, padded_defaults))
+        docstring = ast.get_docstring(function_def)
+        if docstring:
+            docstring = textwrap.shorten(docstring, width=max_width, placeholder="...")
+        else:
+            docstring = "No docstring available"  
+        return signature, docstring
+    except:
+        return "Could not parse signature", "Could not parse docstring"
+
+def get_func_info(func):
+    try:
+        full_name = f"{func.name}" if isinstance(func, Function) else f"{func.class_name}.{func.name}"
+    except:
+        full_name = func.name
+
+    signature, docstring = extract_signature_and_docstring(func.code)
+    ftype = "Function" if isinstance(func, Function) else "Method"
+    return full_name, signature, docstring, ftype
+
+
+@r2e.command()
+@click.option('--exp_id', '-e', default="temp", help="Experiment ID used for prefixing the extracted functions file")
+@click.option('--limit', '-l', default=10, type=int, help="The maximum number of functions to list")
+@click.option('--detailed', '-d', is_flag=True, default=False, help="Show detailed information for each function")
+def list_functions(exp_id, detailed, limit):
+    """List the extracted functions and methods."""
+    file_path = os.path.join(EXTRACTED_DATA_DIR, f"{exp_id}_extracted.json")
+    
+    if not os.path.exists(file_path):
+        click.echo(f"No extracted functions found for experiment ID: {exp_id}")
+        return
+
+    functions = load_functions(file_path)
+    click.echo(f"Total extracted functions/methods: {len(functions)}")
+
+    for i, func in enumerate(functions[:limit], 1):
+        full_name, signature, docstring, ftype = get_func_info(func)
+        if detailed:
+            click.echo(f"\n{i}. {ftype}: {full_name}")
+            click.echo(f"   File: {func.file.relative_file_path}")
+            click.echo(f"   Signature: {func.name}({signature})")
+            click.echo(f"   Docstring: {docstring}")
+        else:
+            click.echo(f"{i}. {full_name} ({func.file.relative_file_path}) [{ftype}]")
+
+    if len(functions) > limit:
+        click.echo(f"\n... and {len(functions) - limit} more functions/methods. Use --limit to list more.")
+
+    if not detailed:
+        click.echo("\nUse --detailed or -d for more information about each function.")
+
+
+################### r2e show ###################
+
+@r2e.command()
+@click.option('--exp_id', '-e', default="temp", help="Experiment ID used for prefixing the extracted functions file")
+@click.option('--fname', '-f', required=True, help="Name of the function to show.")
+@click.option('--show-code', '-c', is_flag=True, help="Show the code of the function.")
+@click.option('--show-test', '-t', is_flag=True, help="Show the generated test for the function.")
+def show(exp_id, fname, show_code, show_test):
+    """Show detailed information about a specific function."""
+    extracted_file_path = os.path.join(EXTRACTED_DATA_DIR, f"{exp_id}_extracted.json")
+    
+    if not os.path.exists(extracted_file_path):
+        click.echo(f"No extracted functions found for experiment ID: {exp_id}")
+        return
+
+    functions = load_functions(extracted_file_path)
+    target_function = next((func for func in functions if func.name == fname), None)
+    if not target_function:
+        click.echo(f"No function named '{fname}' found in the extracted data.")
+        return
+    
+    full_name, signature, docstring, ftype = get_func_info(target_function)
+
+    click.echo(f"{ftype}: {full_name}")
+    click.echo(f"File: {target_function.file.file_path}")
+    
+    if show_code:
+        click.echo("Code:\n")
+        click.echo(textwrap.indent(target_function.code, '    '))
+
+    if show_test:
+        testgen_file_path = os.path.join(TESTGEN_DIR, f"{exp_id}_generate.json")
+        if not os.path.exists(testgen_file_path):
+            click.echo(f"\nNo generated tests found for experiment ID: {exp_id}")
+            return
+
+        functions_under_test = load_functions_under_test(testgen_file_path)
+        target_fut = next((fut for fut in functions_under_test if fut.name == fname), None)
+        
+        if not target_fut:
+            click.echo(f"\nNo generated test found for function '{fname}'.")
+            return
+
+        click.echo("Generated Test:")
+        for test_name, test_code in target_fut.test_history.latest_tests.items():
+            click.echo(f"\n{test_name}:")
+            click.echo(textwrap.indent(test_code, '    '))
 
 
 if __name__ == '__main__':
