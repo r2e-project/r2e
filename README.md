@@ -158,7 +158,8 @@ python r2e/generators/testgen/generate.py
 Relevant Code: [execute.py](./r2e/execution/execute.py)
 
 ```bash
-python r2e/execution/execute.py 
+python r2e/execution/execute.py
+    -i <input_json>
     --exp_id <experiment_id> 
     --execution_multiprocess <num_processes>
     --timeout_per_task <execution_timeout>
@@ -166,6 +167,7 @@ python r2e/execution/execute.py
 ```
 
 Replace:
+- <input_json> with the path to the JSON file containing the generated tests.
 - <experiment_id> with the experiment ID of the previous test generation step.
 - <num_processes> with the number of processes you want to use for execution.
 - <execution_timeout> with the timeout for each test execution.
