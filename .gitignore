@@ -3,6 +3,7 @@ _temp/
 tmp.txt
 logs
 install_logs
+*.dockerfile
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
