@@ -38,7 +38,7 @@ dependencies = [
     "tomlkit>=0.12.4",
     "tqdm>=4.66.2",
     "vllm>=0.4.1",
-    r2e-test-server = "^0.1.5"
+    "r2e-test-server>=0.1.5",
 ]
 
 [build-system]
