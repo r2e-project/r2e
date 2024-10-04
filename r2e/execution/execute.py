@@ -17,7 +17,6 @@ class EquivalenceTestRunner:
     def run(args):
         """Run equivalence tests for functions"""
         futs = load_functions_under_test(TESTGEN_DIR / args.in_file)
-        futs = futs[:1]
         print(f"Loaded {len(futs)} functions under test")
 
         new_futs = []
