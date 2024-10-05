@@ -7,6 +7,8 @@ from r2e.models import FunctionUnderTest, MethodUnderTest
 from r2e.execution.service import ServiceManager
 from r2e.execution.utils import get_fut_data
 
+from r2e.logger import exec_logger as logger
+
 
 def run_fut_with_port_mp(args) -> tuple[bool, str, FunctionUnderTest | MethodUnderTest]:
     fut: FunctionUnderTest | MethodUnderTest = args[0]
@@ -93,7 +95,7 @@ def self_equiv_futs(
         futs[0].test_history.update_exec_stats(
             {"output": init_output, "error": init_error}
         )
-        print(f"Init Error@{futs[0].id}:\n{init_error}\n\n")
+        logger.error(f"Init Error@{futs[0].id}:\n{init_error}\n\n")
         return False, init_error, futs[0]
 
     ####### Execute the equivalence test #######
@@ -102,14 +104,14 @@ def self_equiv_futs(
         submit_response = service.submit()
     except Exception as e:
         futs[0].test_history.update_exec_stats({"error": repr(e)})
-        print(f"Submit Error@{futs[0].id}:\n{repr(e)}\n\n")
+        logger.error(f"Submit Error@{futs[0].id}:\n{repr(e)}\n\n")
         return False, repr(e), futs[0]
 
     submit_error = str(submit_response["error"])
 
     if "logs" not in submit_response:
         futs[0].test_history.update_exec_stats({"error": submit_error})
-        print(f"Submit Error@{futs[0].id}:\n{submit_error}\n\n")
+        logger.error(f"Submit Error@{futs[0].id}:\n{submit_error}\n\n")
         return False, submit_error, futs[0]
 
     submit_logs = json.loads(submit_response["logs"])
