@@ -56,6 +56,27 @@ class TestHistory(BaseModel):
         return last_tests.exec_stats["coverage_logs"][-1]
 
     @property
+    def latest_errors(self) -> str:
+        """Returns a report of the latest test run errors"""
+        last_tests = self.history[-1]
+
+        # error before tests ran (e.g., imports)
+        if "error" in last_tests.exec_stats:
+            return last_tests.exec_stats["error"]
+
+        if "run_tests_errors" not in last_tests.exec_stats:
+            return ""
+
+        format_err = lambda e: f"{e['type']}: {e['test']}:\n{e['message']}"
+        last_errors = [
+            format_err(e)
+            for errors in last_tests.exec_stats["run_tests_errors"].values()
+            for e in errors
+        ]
+
+        return "\n".join(last_errors)
+
+    @property
     def is_passing(self) -> bool:
         """Returns True if the latest tests are passing"""
         if len(self.history) == 0:

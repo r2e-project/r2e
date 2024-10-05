@@ -29,6 +29,11 @@ class BaseUnderTest(BaseModel):
         "Returns the coverage of the latest tests"
         return self.test_history.latest_coverage
 
+    @property
+    def errors(self) -> str:
+        "Returns the errors of the latest tests"
+        return self.test_history.latest_errors
+
     def update_history(self, tests: Tests):
         """Update the test history of the function with new tests"""
         self.test_history.add(tests)
