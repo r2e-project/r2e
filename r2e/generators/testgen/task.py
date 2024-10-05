@@ -8,6 +8,8 @@ from r2e.generators.testgen.prompt import (
     TASK_MESSAGE_FUNCTION,
     TASK_MESSAGE_METHOD,
     OVERSAMPLE_MESSAGE,
+    FIX_ERROR_MESSAGE,
+    IMPROVE_COVERAGE_MESSAGE,
 )
 
 
@@ -48,17 +50,49 @@ class TestGenTask:
             },
         ]
 
-    def update(self, generated_test: str):
+    def update(
+        self, generated_test: str, feedback: str = "", update_type: str = "oversample"
+    ):
         self.generated_test = generated_test
-        self.chat_messages.extend(
-            [
-                {
-                    "role": "assistant",
-                    "content": f"```python\n{generated_test}\n```",
-                },
-                {
-                    "role": "user",
-                    "content": OVERSAMPLE_MESSAGE,
-                },
-            ]
-        )
+
+        if update_type == "oversample":
+            self.chat_messages.extend(
+                [
+                    {
+                        "role": "assistant",
+                        "content": f"```python\n{generated_test}\n```",
+                    },
+                    {
+                        "role": "user",
+                        "content": OVERSAMPLE_MESSAGE,
+                    },
+                ]
+            )
+
+        elif update_type == "fix_error":
+            self.chat_messages.extend(
+                [
+                    {
+                        "role": "assistant",
+                        "content": f"```python\n{generated_test}\n```",
+                    },
+                    {
+                        "role": "user",
+                        "content": FIX_ERROR_MESSAGE.format(feedback=feedback),
+                    },
+                ]
+            )
+
+        elif update_type == "improve_coverage":
+            self.chat_messages.extend(
+                [
+                    {
+                        "role": "assistant",
+                        "content": f"```python\n{generated_test}\n```",
+                    },
+                    {
+                        "role": "user",
+                        "content": IMPROVE_COVERAGE_MESSAGE.format(feedback=feedback),
+                    },
+                ]
+            )
