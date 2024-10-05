@@ -4115,13 +4115,13 @@ cffi = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "r2e-test-server"
-version = "0.1.7"
+version = "0.1.8"
 description = "Test Server For R2E"
 optional = false
 python-versions = "<4.0,>=3.7"
 files = [
-    {file = "r2e_test_server-0.1.7-py3-none-any.whl", hash = "sha256:3c1b868a2add1829923131096aa49bcb44ac63633d8da3d71c4a7480db41814f"},
-    {file = "r2e_test_server-0.1.7.tar.gz", hash = "sha256:8b842a27734e35c28c895f177343f10961f123b2bbffae1824b25693d37d6966"},
+    {file = "r2e_test_server-0.1.8-py3-none-any.whl", hash = "sha256:5f7ca1ba1564ab76b09d986a8f433959169ec1b1eb9699a8c937dc2a7cf8c3fb"},
+    {file = "r2e_test_server-0.1.8.tar.gz", hash = "sha256:82d4aad1337f84bf1fdd119c1f37f56b4d9712f5163d692eb0b74869242f3169"},
 ]
 
 [package.dependencies]
