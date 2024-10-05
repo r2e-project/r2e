@@ -27,6 +27,11 @@ class TestGenArgs(LLMArgs):
         description="Experiment ID used for prefixing the generated tests file.",
     )
 
+    save_chat: bool = Field(
+        False,
+        description="Whether to save the chat messages",
+    )
+
 
 class TestRepairArgs(TestGenArgs, ExecutionArgs):
     max_rounds: int = Field(

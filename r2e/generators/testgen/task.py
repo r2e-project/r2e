@@ -55,6 +55,10 @@ class TestGenTask:
     ):
         self.generated_test = generated_test
 
+        # avoid duplicate assistant messages when updating
+        if self.chat_messages[-1]["role"] == "assistant":
+            self.chat_messages.pop()
+
         if update_type == "oversample":
             self.chat_messages.extend(
                 [

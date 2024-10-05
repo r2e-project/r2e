@@ -38,14 +38,18 @@ class R2ETestGenerator:
         results = get_generated_tests(outputs)
         futs = [create_code_under_test(task.func_meth) for task in tasks]
 
-        for fut, test in zip(futs, results):
-            fut.update_history(
-                Tests(
-                    tests={f"test_{test_id}": test},
-                    gen_model=args.model_name,
-                    gen_date=timestamp(),
-                )
+        for fut, test, op, msgs in zip(futs, results, outputs, payloads):
+            tests = Tests(
+                tests={f"test_{test_id}": test},
+                gen_model=args.model_name,
+                gen_date=timestamp(),
             )
+
+            if args.save_chat:
+                msgs.append({"role": "assistant", "content": op[0]})
+                tests.update_chat_messages(msgs)
+
+            fut.update_history(tests)
 
         if write_to_file:
             TESTGEN_DIR.mkdir(parents=True, exist_ok=True)

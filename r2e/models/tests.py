@@ -8,6 +8,7 @@ class Tests(BaseModel):
     gen_model: Optional[str] = None
     gen_date: Optional[str] = None
     exec_stats: Optional[dict[str, Any]] = None
+    chat_messages: Optional[list[dict[str, str]]] = None
 
     def add(self, test_id: str, test: str):
         """Add a test to the tests"""
@@ -16,6 +17,10 @@ class Tests(BaseModel):
     def update_stats(self, stats: dict[str, Any]):
         """Update the execution stats of the tests"""
         self.exec_stats = stats
+
+    def update_chat_messages(self, messages: list[dict[str, str]]):
+        """Update the chat messages of the tests"""
+        self.chat_messages = messages
 
 
 class TestHistory(BaseModel):
