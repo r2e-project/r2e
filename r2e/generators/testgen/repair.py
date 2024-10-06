@@ -10,6 +10,7 @@ from r2e.execution.execute import EquivalenceTestRunner
 from r2e.generators.testgen.args import TestRepairArgs
 from r2e.generators.testgen.generate import R2ETestGenerator
 from r2e.generators.testgen.task import TestGenTask
+from r2e.generators.testgen.utils import annotate_coverage
 
 
 class R2ETestRepair:
@@ -18,7 +19,7 @@ class R2ETestRepair:
     def genexec(args):
         """Iteratively generate and execute tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
-        functions = functions[:5]
+        functions = functions[:10]
 
         final_output_file = EXECUTION_DIR / f"{args.exp_id}_genexec_out.json"
         worklist: list[TestGenTask] = R2ETestGenerator.prepare_tasks(args, functions)
@@ -29,14 +30,10 @@ class R2ETestRepair:
 
         for round in range(1, args.max_rounds + 1):
             print(f"Starting round {round}/{args.max_rounds}")
-            # generate tests for the worklist
+            # generate -> execute -> filter
             futs = R2ETestRepair.generate(args, futs, worklist, round)
-
-            # execute the futs
             futs = R2ETestRepair.execute(args, futs)
-            status_map, _continue = R2ETestRepair.filter(
-                futs, worklist, args.min_cov, args.min_valid
-            )
+            status_map, _continue = R2ETestRepair.filter(futs, worklist, args)
 
             # update current results
             current_results = R2ETestRepair._update_current_results(
@@ -55,7 +52,7 @@ class R2ETestRepair:
                 break
 
             good_ratio = (count - len(worklist)) / count
-            print(f"Round {round} completed. Status: {good_ratio:.2f} good FUTs.")
+            print(f"Round {round} completed. Status: {good_ratio:.2f} good FUTs.\n")
 
         # sort the results in the order of the original functions
         sorted_results = R2ETestRepair._sort_results(functions, current_results)
@@ -76,6 +73,7 @@ class R2ETestRepair:
 
     @staticmethod
     def execute(args, futs):
+        """Execute the tests for the functions and return updated FUTs"""
         with NamedTemporaryFile(mode="w", delete=False, suffix=".json") as tmp_file:
             write_functions_under_test(futs, tmp_file.name)
             args.in_file = tmp_file.name
@@ -86,27 +84,17 @@ class R2ETestRepair:
         return futs
 
     @staticmethod
-    def update_task(task, result, update_type):
-        if update_type == "fix_error":
-            feedback = "This test failed due to an error. Please fix."
-        elif update_type == "improve_coverage":
-            feedback = "This test has low coverage. Please improve."
-        task.update(result, feedback, update_type)
-        return task
-
-    @staticmethod
-    def filter(futs, tasks, min_cov, min_valid):
-        # TODO: pass execution result as feedback via status_map
-
+    def filter(futs, tasks, args):
         good_futs, status_map = 0, {}
 
         for i, fut in enumerate(futs):
+            fut_coverage = fut.coverage.get("branch_coverage_percentage", 0) / 100
             if fut.is_passing:
-                if fut.coverage.get("branch_coverage_percentage", 0) < min_cov:
-                    status_map[i] = (False, "improve_coverage")
+                if fut_coverage < args.min_cov:
+                    status_map[i] = (False, "improve_coverage", annotate_coverage(fut))
                 else:
                     good_futs += 1
-                    status_map[i] = (True, None)
+                    status_map[i] = (True, None, None)
                 continue
 
             # has no exec_stats --> a setup issue the LLM cannot fix
@@ -114,9 +102,9 @@ class R2ETestRepair:
                 continue
 
             # test run errored out or failed
-            status_map[i] = (False, "fix_error")
+            status_map[i] = (False, "fix_error", fut.errors)
 
-        _continue = (good_futs / len(futs)) < min_valid
+        _continue = (good_futs / len(futs)) < args.min_valid
         return status_map, _continue
 
     ############################## helper functions ##############################
@@ -124,14 +112,21 @@ class R2ETestRepair:
     @staticmethod
     def _update_worklist(worklist, futs, status_map, round):
         return [
-            R2ETestRepair.update_task(worklist[i], futs[i].tests[f"test_{round-1}"], ut)
-            for i, (passing, ut) in status_map.items()
+            R2ETestRepair._update_task(
+                worklist[i], futs[i].tests[f"test_{round-1}"], ut, feedback
+            )
+            for i, (passing, ut, feedback) in status_map.items()
             if not passing
         ]
 
     @staticmethod
+    def _update_task(task, result, update_type, feedback):
+        task.update(result, feedback, update_type)
+        return task
+
+    @staticmethod
     def _update_current_results(current_results, futs, status_map, round, max_rounds):
-        for i, (passing, _) in status_map.items():
+        for i, (passing, _, _) in status_map.items():
             if passing:
                 current_results.append(futs[i])
             elif round == max_rounds:

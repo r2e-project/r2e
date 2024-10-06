@@ -50,13 +50,13 @@ class TestHistory(BaseModel):
     def latest_coverage(self) -> float:
         """Returns the coverage logs of the latest test run"""
         if not self.is_passing:
-            return 0
+            return {}
 
         last_tests = self.history[-1]
         if last_tests.exec_stats is None:
-            return 0
+            return {}
         if "coverage_logs" not in last_tests.exec_stats:
-            return 0
+            return {}
 
         return last_tests.exec_stats["coverage_logs"][-1]
 

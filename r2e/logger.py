@@ -36,7 +36,7 @@ def setup_logging(name="r2e", level=logging.WARNING, log_file=None, console=True
 if not os.path.exists("logs"):
     os.makedirs("logs")
 
-logger = setup_logging(log_file="logs/r2e.log")
+logger = setup_logging(name="r2e", log_file="logs/r2e.log")
 slicer_logger = setup_logging(name="slicer", log_file="logs/slicer.log")
 exec_logger = setup_logging(name="exec", log_file="logs/exec.log", console=False)
 ### usage
