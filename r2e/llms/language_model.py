@@ -86,11 +86,11 @@ LanguageModelList: list[LanguageModel] = [
         style=LanguageModelStyle.OpenAI,
     ),
     LanguageModel(
-        model_name="gpt-4-o",
+        model_name="gpt-4o",
         style=LanguageModelStyle.OpenAI,
     ),
     LanguageModel(
-        model_name="gpt-4-o-mini",
+        model_name="gpt-4o-mini",
         style=LanguageModelStyle.OpenAI,
     ),
 ]
