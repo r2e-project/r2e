@@ -77,6 +77,36 @@ def extract(**kwargs):
 
 ################### r2e generate ###################
 
+def gen_options(f):
+    options = [
+        click.option('--context_type', default="sliced", help="The context type to use for the language model"),
+        click.option('--oversample_rounds', default=1, type=int, help="The number of rounds to oversample"),
+        click.option('--max_context_size', default=6000, type=int, help="The maximum context size"),
+        click.option('--save_chat', is_flag=True, default=False, help="Whether to save the chat messages"),
+    ]
+    for opt in reversed(options):
+        f = opt(f)
+    return f
+
+def llm_options(f):
+    options = [
+        click.option('--multiprocess', '-m', default=8, type=int, help="The number of processes to use for multiprocessing"),
+        click.option('--model_name', default="gpt-4-turbo-2024-04-09", help="The model name to use for the language model"),
+        click.option('--n', default=1, type=int, help="The number of completions to generate"),
+        click.option('--top_p', default=0.95, type=float, help="The nucleus sampling probability"),
+        click.option('--max_tokens', default=1024, type=int, help="The maximum number of tokens to generate"),
+        click.option('--temperature', default=0.2, type=float, help="The temperature for the LLM request"),
+        click.option('--presence_penalty', default=0.0, type=float, help="The presence penalty for the LLM request"),
+        click.option('--frequency_penalty', default=0.0, type=float, help="The frequency penalty for the LLM request"),
+        click.option('--stop', multiple=True, default=[], help="The stop sequence for the LLM request"),
+        click.option('--openai_timeout', default=60, type=int, help="The timeout for the OpenAI API request"),
+        click.option('--use_cache', is_flag=True, default=True, help="Whether to use the cache for LLM queries. Default is True."),
+        click.option('--cache_batch_size', default=30, type=int, help="The batch size for cache writes.")
+    ]
+    for opt in reversed(options):
+        f = opt(f)
+    return f
+
 def _default_in_file_gen(ctx, param, value):
     if not value:
         exp_id = ctx.params.get('exp_id')
@@ -88,23 +118,10 @@ def _default_in_file_gen(ctx, param, value):
 
 @r2e.command()
 @click.option('--exp_id', '-e', default="temp", help="Experiment ID used for prefixing the generated tests file")
+@click.option('--function', '-f', required=True, help="Name of the function to show.")
 @click.option('--in_file', '-i', callback=_default_in_file_gen, help="The input file for the test generator. Defaults to {exp_id}_extracted.json if not provided.")
-@click.option('--context_type', default="sliced", help="The context type to use for the language model")
-@click.option('--oversample_rounds', default=1, type=int, help="The number of rounds to oversample")
-@click.option('--max_context_size', default=6000, type=int, help="The maximum context size")
-# LLMArgs options
-@click.option('--multiprocess', '-m', default=8, type=int, help="The number of processes to use for multiprocessing")
-@click.option('--model_name', default="gpt-4-turbo-2024-04-09", help="The model name to use for the language model")
-@click.option('--n', default=1, type=int, help="The number of completions to generate")
-@click.option('--top_p', default=0.95, type=float, help="The nucleus sampling probability")
-@click.option('--max_tokens', default=1024, type=int, help="The maximum number of tokens to generate")
-@click.option('--temperature', default=0.2, type=float, help="The temperature for the LLM request")
-@click.option('--presence_penalty', default=0.0, type=float, help="The presence penalty for the LLM request")
-@click.option('--frequency_penalty', default=0.0, type=float, help="The frequency penalty for the LLM request")
-@click.option('--stop', multiple=True, default=[], help="The stop sequence for the LLM request")
-@click.option('--openai_timeout', default=60, type=int, help="The timeout for the OpenAI API request")
-@click.option('--use_cache', is_flag=True, default=True, help="Whether to use the cache for LLM queries. Default is True.")
-@click.option('--cache_batch_size', default=30, type=int, help="The batch size for cache writes.")
+@gen_options
+@llm_options
 def generate(**kwargs):
     """Generate equivalence tests for the extracted functions."""
     test_gen_args = TestGenArgs(**kwargs)
@@ -181,7 +198,8 @@ def list_functions(exp_id, detailed, limit):
 @click.option('--fname', '-f', required=True, help="Name of the function to show.")
 @click.option('--show-code', '-c', is_flag=True, help="Show the code of the function.")
 @click.option('--show-test', '-t', is_flag=True, help="Show the generated test for the function.")
-def show(exp_id, fname, show_code, show_test):
+@click.option('--show-all', '-a', is_flag=True, help="Show both the code and the generated test for the function.")
+def show(exp_id, fname, show_code, show_test, show_all):
     """Show detailed information about a specific function."""
     extracted_file_path = os.path.join(EXTRACTED_DATA_DIR, f"{exp_id}_extracted.json")
     
@@ -200,11 +218,11 @@ def show(exp_id, fname, show_code, show_test):
     click.echo(f"{ftype}: {full_name}")
     click.echo(f"File: {target_function.file.file_path}")
     
-    if show_code:
+    if show_code or show_all:
         click.echo("Code:\n")
         click.echo(textwrap.indent(target_function.code, '    '))
 
-    if show_test:
+    if show_test or show_all:
         testgen_file_path = os.path.join(TESTGEN_DIR, f"{exp_id}_generate.json")
         if not os.path.exists(testgen_file_path):
             click.echo(f"\nNo generated tests found for experiment ID: {exp_id}")
@@ -217,13 +235,30 @@ def show(exp_id, fname, show_code, show_test):
             click.echo(f"\nNo generated test found for function '{fname}'.")
             return
 
-        click.echo("Generated Test:")
+        if show_all:
+            click.echo("\nGenerated Test:")
+        else:
+            click.echo("Generated Test:")
+
         for test_name, test_code in target_fut.test_history.latest_tests.items():
             click.echo(f"\n{test_name}:")
             click.echo(textwrap.indent(test_code, '    '))
 
 
 ################### r2e execute ###################
+
+def exec_options(f):
+    options = [
+        click.option('--local', is_flag=True, default=False, help="Whether to run the execution service locally. Default is docker."),
+        click.option('--image', default="r2e:temp", help="The name of the docker image in which to run the tests"),
+        click.option('--execution-multiprocess', '-m', default=20, type=int, help="The number of processes to use for executing the functions and methods"),
+        click.option('--port', default=3006, type=int, help="The port to use for the execution service. Default is 3006 for sequential execution. For parallel, port is randomly picked."),
+        click.option('--timeout-per-task', default=180, type=int, help="The timeout for the execution service to complete one task in seconds"),
+        click.option('--batch-size', default=100, type=int, help="The number of functions to run before writing the output to the file")
+    ]
+    for opt in reversed(options):
+        f = opt(f)
+    return f
 
 def _default_in_file_exec(ctx, param, value):
     if not value:
@@ -235,13 +270,9 @@ def _default_in_file_exec(ctx, param, value):
 
 @r2e.command()
 @click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
+@click.option('--function', '-f', required=True, help="Name of the function to show.")
 @click.option('--in-file', '-i', callback=_default_in_file_exec, help="The input file for the test execution")
-@click.option('--local', is_flag=True, default=False, help="Whether to run the execution service locally. Default is docker.")
-@click.option('--image', default="r2e:temp", help="The name of the docker image in which to run the tests")
-@click.option('--execution-multiprocess', '-m', default=20, type=int, help="The number of processes to use for executing the functions and methods")
-@click.option('--port', default=3006, type=int, help="The port to use for the execution service. Default is 3006 for sequential execution. For parallel, port is randomly picked.")
-@click.option('--timeout-per-task', default=180, type=int, help="The timeout for the execution service to complete one task in seconds")
-@click.option('--batch-size', default=100, type=int, help="The number of functions to run before writing the output to the file")
+@exec_options
 def execute(**kwargs):
     """Execute the generated equivalence tests."""
     
@@ -265,6 +296,37 @@ def execute(**kwargs):
     EXECUTION_DIR.mkdir(parents=True, exist_ok=True)
     EquivalenceTestRunner.run(args)
     click.echo("Test execution completed successfully.")
+
+
+################### r2e genexec ###################
+
+@r2e.command()
+@click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
+@click.option('--function', '-f', required=True, help="Name of the function to show.")
+@click.option('--in-file', '-i', callback=_default_in_file_exec, help="The input file for the genexec agent.")
+@click.option('--max_rounds', '-k', default=3, type=int, help="The maximum number of rounds to run the genexec process")
+@click.option('--min-cov', default=0.8, type=float, help="The minimum branch coverage to consider a test valid")
+@click.option('--min-valid', default=0.8, type=float, help="The minimum percentage of valid problems to achieve in the dataset")
+@gen_options
+@llm_options
+@exec_options
+def genexec(**kwargs):
+    """Generate-and-Execute Agent that iteratively generates and executes tests."""
+    
+    if kwargs['local']:
+        click.echo(f"Note: Running the execution service locally. Remove --local for docker.")
+        kwargs['image'] = "r2e:temp"
+    elif not kwargs['image']:
+        click.echo(f"Warning: --image not provided. Using `r2e:{kwargs['exp_id']}` as per `exp_id`.")
+        kwargs['image'] = f"r2e:{kwargs['exp_id']}"
+    elif kwargs['image'] == "r2e:temp":
+        click.echo("Warning: Using the default image `r2e:temp`. Use --image for custom image.")
+    else:
+        click.echo(f"Note: Using the provided image: {kwargs['image']}")
+    
+    args = TestRepairArgs(**kwargs)
+    EXECUTION_DIR.mkdir(parents=True, exist_ok=True)
+    R2ETestRepair.genexec(args)
 
 if __name__ == '__main__':
     r2e()
