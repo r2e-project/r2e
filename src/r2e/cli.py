@@ -303,7 +303,7 @@ def execute(**kwargs):
 @r2e.command()
 @click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
 @click.option('--function', '-f', required=True, help="Name of the function to show.")
-@click.option('--in-file', '-i', callback=_default_in_file_exec, help="The input file for the genexec agent.")
+@click.option('--in-file', '-i', callback=_default_in_file_gen, help="The input file for the genexec agent.")
 @click.option('--max_rounds', '-k', default=3, type=int, help="The maximum number of rounds to run the genexec process")
 @click.option('--min-cov', default=0.8, type=float, help="The minimum branch coverage to consider a test valid")
 @click.option('--min-valid', default=0.8, type=float, help="The minimum percentage of valid problems to achieve in the dataset")
