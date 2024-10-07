@@ -36,17 +36,17 @@ class R2EGenExec:
         for round in range(1, args.max_rounds + 1):
             print(f"Starting round {round}/{args.max_rounds}")
             # generate -> execute -> filter
-            futs = R2ETestRepair.generate(args, futs, worklist, round)
-            futs = R2ETestRepair.execute(args, futs)
-            status_map, _continue = R2ETestRepair.filter(futs, worklist, args)
+            futs = R2EGenExec.generate(args, futs, worklist, round)
+            futs = R2EGenExec.execute(args, futs)
+            status_map, _continue = R2EGenExec.filter(futs, worklist, args)
 
             # update current results
-            current_results = R2ETestRepair._update_current_results(
+            current_results = R2EGenExec._update_current_results(
                 current_results, futs, status_map, round, args.max_rounds
             )
 
             # update worklist=tasks for failing futs
-            worklist = R2ETestRepair._update_worklist(worklist, futs, status_map, round)
+            worklist = R2EGenExec._update_worklist(worklist, futs, status_map, round)
 
             if not _continue or len(worklist) == 0:
                 print(f"Reached minimum criteria. Stopping at round {round}")
@@ -60,7 +60,7 @@ class R2EGenExec:
             print(f"Round {round} completed. Status: {good_ratio:.2f} good FUTs.\n")
 
         # sort the results in the order of the original functions
-        sorted_results = R2ETestRepair._sort_results(functions, current_results)
+        sorted_results = R2EGenExec._sort_results(functions, current_results)
         write_functions_under_test(sorted_results, final_output_file)
 
     @staticmethod
@@ -117,7 +117,7 @@ class R2EGenExec:
     @staticmethod
     def _update_worklist(worklist, futs, status_map, round):
         return [
-            R2ETestRepair._update_task(
+            R2EGenExec._update_task(
                 worklist[i], futs[i].tests[f"test_{round-1}"], ut, feedback
             )
             for i, (passing, ut, feedback) in status_map.items()
