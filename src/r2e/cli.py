@@ -2,6 +2,7 @@
 import os
 import click
 import ast
+import json
 import textwrap
 
 from r2e.repo_builder import RepoArgs, SetupRepos, build_functions_and_methods
@@ -198,8 +199,10 @@ def list_functions(exp_id, detailed, limit):
 @click.option('--fname', '-f', required=True, help="Name of the function to show.")
 @click.option('--show-code', '-c', is_flag=True, help="Show the code of the function.")
 @click.option('--show-test', '-t', is_flag=True, help="Show the generated test for the function.")
+@click.option('--show-result', '-r', is_flag=True, help="Show the generated test for the function.")
+@click.option('--show-chat', is_flag=True, help="Show the chat messages leading up to the final test for the function.")
 @click.option('--show-all', '-a', is_flag=True, help="Show both the code and the generated test for the function.")
-def show(exp_id, fname, show_code, show_test, show_all):
+def show(exp_id, fname, show_code, show_test, show_result, show_chat, show_all):
     """Show detailed information about a specific function."""
     extracted_file_path = os.path.join(EXTRACTED_DATA_DIR, f"{exp_id}_extracted.json")
     
@@ -222,28 +225,69 @@ def show(exp_id, fname, show_code, show_test, show_all):
         click.echo("Code:\n")
         click.echo(textwrap.indent(target_function.code, '    '))
 
+    testgen_file_path = os.path.join(TESTGEN_DIR, f"{exp_id}_generate.json")
+    executed_file_path = os.path.join(EXECUTION_DIR, f"{exp_id}_out.json")
+
     if show_test or show_all:
-        testgen_file_path = os.path.join(TESTGEN_DIR, f"{exp_id}_generate.json")
-        if not os.path.exists(testgen_file_path):
+        if not os.path.exists(testgen_file_path) or not os.path.exists(executed_file_path):
             click.echo(f"\nNo generated tests found for experiment ID: {exp_id}")
             return
 
-        functions_under_test = load_functions_under_test(testgen_file_path)
+        if os.path.exists(executed_file_path):
+            functions_under_test = load_functions_under_test(executed_file_path)
+        else:
+            functions_under_test = load_functions_under_test(testgen_file_path)
+            
         target_fut = next((fut for fut in functions_under_test if fut.name == fname), None)
         
         if not target_fut:
             click.echo(f"\nNo generated test found for function '{fname}'.")
             return
 
-        if show_all:
-            click.echo("\nGenerated Test:")
-        else:
-            click.echo("Generated Test:")
+        click.echo("\nGenerated Test:")
 
         for test_name, test_code in target_fut.test_history.latest_tests.items():
             click.echo(f"\n{test_name}:")
             click.echo(textwrap.indent(test_code, '    '))
+        
+    if show_result or show_all:
+        if not os.path.exists(executed_file_path):
+            click.echo(f"\nNo executed tests found for experiment ID: {exp_id}")
+            return
 
+        executed_futs = load_functions_under_test(executed_file_path)
+        target_executed_fut = next((fut for fut in executed_futs if fut.name == fname), None)
+        
+        if not target_executed_fut:
+            click.echo(f"\nNo executed test found for function '{fname}'.")
+            return
+
+        click.echo("\nTest Results:")
+
+        for test_name, results in target_executed_fut.exec_stats['run_tests_logs'].items():
+            click.echo(f"\n{test_name}:")
+            click.echo(json.dumps(results, indent=4))
+            click.echo(json.dumps(target_executed_fut.coverage, indent=4))
+    
+    if show_chat or show_all:
+        if not os.path.exists(executed_file_path):
+            click.echo(f"\nNo executed tests found for experiment ID: {exp_id}")
+            return
+
+        executed_futs = load_functions_under_test(executed_file_path)
+        target_executed_fut = next((fut for fut in executed_futs if fut.name == fname), None)
+        
+        if not target_executed_fut:
+            click.echo(f"\nNo executed test found for function '{fname}'.")
+            return
+
+        click.echo("\nChat Messages:")
+        
+        for chat_messages in target_executed_fut.test_history.latest_chat_messages:
+            click.secho(f"{chat_messages['role'].capitalize()}:", fg="green")
+            truncated_content = '\n'.join(chat_messages['content'].split('\n')[:50])
+            click.echo(truncated_content)
+                    
 
 ################### r2e execute ###################
 
