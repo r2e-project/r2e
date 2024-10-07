@@ -38,7 +38,7 @@ class TestGenArgs(LLMArgs):
     )
 
 
-class TestRepairArgs(TestGenArgs, ExecutionArgs):
+class GenExecArgs(TestGenArgs, ExecutionArgs):
     max_rounds: int = Field(
         3,
         description="The maximum number of rounds to run the genexec process",
