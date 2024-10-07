@@ -5,7 +5,7 @@ import ast
 import textwrap
 
 from r2e.repo_builder import RepoArgs, SetupRepos, build_functions_and_methods
-from r2e.generators.testgen import TestGenArgs, R2ETestGenerator
+from r2e.generators.testgen import TestGenArgs, R2ETestGenerator, GenExecArgs, R2EGenExec
 from r2e.execution.args import ExecutionArgs
 from r2e.execution.execute import EquivalenceTestRunner
 
@@ -324,9 +324,9 @@ def genexec(**kwargs):
     else:
         click.echo(f"Note: Using the provided image: {kwargs['image']}")
     
-    args = TestRepairArgs(**kwargs)
+    args = GenExecArgs(**kwargs)
     EXECUTION_DIR.mkdir(parents=True, exist_ok=True)
-    R2ETestRepair.genexec(args)
+    R2EGenExec.genexec(args)
 
 if __name__ == '__main__':
     r2e()
