@@ -47,7 +47,7 @@ class GenExecArgs(TestGenArgs, ExecutionArgs):
         0.8,
         description="The minimum branch coverage to consider a test valid",
     )
-    min_valid: int = Field(
+    min_valid: float = Field(
         0.8,
         description="The minimum percentage of valid problems to achieve in the dataset",
     )
