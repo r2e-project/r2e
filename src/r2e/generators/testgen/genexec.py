@@ -26,7 +26,7 @@ class R2EGenExec:
         if args.function:
             functions = [f for f in functions if f.name == args.function]
 
-        final_output_file = EXECUTION_DIR / f"{args.exp_id}_genexec_out.json"
+        final_output_file = EXECUTION_DIR / f"{args.exp_id}_out.json"
         worklist: list[TestGenTask] = R2ETestGenerator.prepare_tasks(args, functions)
         count = len(worklist)
 
