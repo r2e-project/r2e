@@ -9,13 +9,13 @@ from r2e.utils.data import *
 from r2e.paths import *
 
 from r2e.execution.execute import EquivalenceTestRunner
-from r2e.generators.testgen.args import TestRepairArgs
+from r2e.generators.testgen.args import GenExecArgs
 from r2e.generators.testgen.generate import R2ETestGenerator
 from r2e.generators.testgen.task import TestGenTask
 from r2e.generators.testgen.utils import annotate_coverage
 
 
-class R2ETestRepair:
+class R2EGenExec:
 
     @staticmethod
     def genexec(args):
@@ -152,5 +152,5 @@ class R2ETestRepair:
 
 
 if __name__ == "__main__":
-    args = fire.Fire(TestRepairArgs)
-    R2ETestRepair.genexec(args)
+    args = fire.Fire(GenExecArgs)
+    R2EGenExec.genexec(args)
