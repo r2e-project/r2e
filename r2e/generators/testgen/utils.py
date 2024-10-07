@@ -33,9 +33,10 @@ def annotate_coverage(fut) -> str:
     def annotate(i, line):
         """Annotate the line {i} with a comment"""
         indentation = "".join(it for it in line[: len(line) - len(line.lstrip())])
-        if i in unexecuted_lines and i != start_line:
-            return f"{indentation}# UNCOVERED LINE\n{line}"
-        elif i in unevaluated_branches:
+        # note: uncomment if we want to annotate for line coverage
+        # if i in unexecuted_lines and i != start_line:
+        #     return f"{indentation}# UNCOVERED LINE\n{line}"
+        if i in unevaluated_branches:
             return f"{indentation}# UNEVALUATED BRANCH\n{line}"
         return line
 

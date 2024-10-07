@@ -1,3 +1,5 @@
+"""A simple agent-based test generator with execution and coverage feedback"""
+
 import os
 import fire
 from tempfile import NamedTemporaryFile
@@ -20,6 +22,9 @@ class R2ETestRepair:
         """Iteratively generate and execute tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
         functions = functions[:10]
+
+        if args.function:
+            functions = [f for f in functions if f.name == args.function]
 
         final_output_file = EXECUTION_DIR / f"{args.exp_id}_genexec_out.json"
         worklist: list[TestGenTask] = R2ETestGenerator.prepare_tasks(args, functions)

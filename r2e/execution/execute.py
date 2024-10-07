@@ -19,6 +19,9 @@ class EquivalenceTestRunner:
         futs = load_functions_under_test(TESTGEN_DIR / args.in_file)
         print(f"Loaded {len(futs)} functions under test")
 
+        if args.function:
+            futs = [f for f in futs if f.name == args.function]
+
         new_futs = []
         if args.execution_multiprocess == 0:
             new_futs = EquivalenceTestRunner._run_futs_sequential(futs, args)

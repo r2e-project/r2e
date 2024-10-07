@@ -28,6 +28,10 @@ class R2ETestGenerator:
     def generate(args):
         """Generate tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
+
+        if args.function:
+            functions = [f for f in functions if f.name == args.function]
+
         tasks = R2ETestGenerator.prepare_tasks(args, functions)
         R2ETestGenerator._generate(args, tasks, write_to_file=True)
 

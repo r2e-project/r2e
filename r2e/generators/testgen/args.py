@@ -22,6 +22,11 @@ class TestGenArgs(LLMArgs):
         description="The input file for the test generator",
     )
 
+    function: str = Field(
+        None,
+        description="A specific function to generate tests for",
+    )
+
     exp_id: str = Field(
         "temp",
         description="Experiment ID used for prefixing the generated tests file.",
