@@ -1,4 +1,5 @@
 from r2e.llms.llm_args import LLMArgs
+from r2e.execution.args import ExecutionArgs
 from pydantic import Field
 
 
@@ -21,7 +22,32 @@ class TestGenArgs(LLMArgs):
         description="The input file for the test generator",
     )
 
+    function: str = Field(
+        None,
+        description="A specific function to generate tests for",
+    )
+
     exp_id: str = Field(
         "temp",
         description="Experiment ID used for prefixing the generated tests file.",
+    )
+
+    save_chat: bool = Field(
+        False,
+        description="Whether to save the chat messages",
+    )
+
+
+class TestRepairArgs(TestGenArgs, ExecutionArgs):
+    max_rounds: int = Field(
+        3,
+        description="The maximum number of rounds to run the genexec process",
+    )
+    min_cov: float = Field(
+        0.8,
+        description="The minimum branch coverage to consider a test valid",
+    )
+    min_valid: int = Field(
+        0.8,
+        description="The minimum percentage of valid problems to achieve in the dataset",
     )

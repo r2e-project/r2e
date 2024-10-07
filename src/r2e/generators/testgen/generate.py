@@ -29,35 +29,39 @@ class R2ETestGenerator:
         """Generate tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
 
+        if args.function:
+            functions = [f for f in functions if f.name == args.function]
+
         tasks = R2ETestGenerator.prepare_tasks(args, functions)
-        payloads = [task.chat_messages for task in tasks]
-
-        outputs = LLMCompletions.get_llm_completions(args, payloads)
-
-        results = get_generated_tests(outputs)
-        futs = [create_code_under_test(func) for func in functions]
-
-        for fut, test in zip(futs, results):
-            fut.update_history(
-                Tests(
-                    tests={"test_0": test},
-                    gen_model=args.model_name,
-                    gen_date=timestamp(),
-                )
-            )
-        TESTGEN_DIR.mkdir(parents=True, exist_ok=True)
-        write_functions_under_test(futs, TESTGEN_DIR / f"{args.exp_id}_generate.json")
+        R2ETestGenerator._generate(args, tasks, write_to_file=True)
 
     @staticmethod
-    def execute(args):
-        """Execute the generated tests"""
-        futs = load_functions_under_test(TESTGEN_DIR / args.in_file)
+    def _generate(args, tasks, test_id=0, write_to_file=False):
+        payloads = [task.chat_messages for task in tasks]
+        outputs = LLMCompletions.get_llm_completions(args, payloads)
+        results = get_generated_tests(outputs)
+        futs = [create_code_under_test(task.func_meth) for task in tasks]
 
-        # TODO: use docker client to execute tests
-        # TODO: dump the results to disk
-        # NOTE: (@manish): stats = {sample_id -> stats}; use fut.update_stats
+        for fut, test, op, msgs in zip(futs, results, outputs, payloads):
+            tests = Tests(
+                tests={f"test_{test_id}": test},
+                gen_model=args.model_name,
+                gen_date=timestamp(),
+            )
 
-        raise NotImplementedError("Connect to docker client to execute tests")
+            if args.save_chat:
+                msgs.append({"role": "assistant", "content": op[0]})
+                tests.update_chat_messages(msgs)
+
+            fut.update_history(tests)
+
+        if write_to_file:
+            TESTGEN_DIR.mkdir(parents=True, exist_ok=True)
+            write_functions_under_test(
+                futs, TESTGEN_DIR / f"{args.exp_id}_generate.json"
+            )
+
+        return futs
 
     @staticmethod
     def filter(args):

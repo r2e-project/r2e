@@ -28,6 +28,11 @@ class ExecutionArgs(BaseModel):
         description="Whether to run the execution service locally",
     )
 
+    function: str = Field(
+        None,
+        description="A specific function to generate tests for",
+    )
+
     in_file: str = Field(
         None,
         description="The input file for the test execution",

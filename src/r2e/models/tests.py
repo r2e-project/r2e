@@ -8,6 +8,7 @@ class Tests(BaseModel):
     gen_model: Optional[str] = None
     gen_date: Optional[str] = None
     exec_stats: Optional[dict[str, Any]] = None
+    chat_messages: Optional[list[dict[str, str]]] = None
 
     def add(self, test_id: str, test: str):
         """Add a test to the tests"""
@@ -16,6 +17,10 @@ class Tests(BaseModel):
     def update_stats(self, stats: dict[str, Any]):
         """Update the execution stats of the tests"""
         self.exec_stats = stats
+
+    def update_chat_messages(self, messages: list[dict[str, str]]):
+        """Update the chat messages of the tests"""
+        self.chat_messages = messages
 
 
 class TestHistory(BaseModel):
@@ -40,6 +45,41 @@ class TestHistory(BaseModel):
     @property
     def latest_exec_stats(self) -> Optional[dict[str, Any]]:
         return self.history[-1].exec_stats
+
+    @property
+    def latest_coverage(self) -> float:
+        """Returns the coverage logs of the latest test run"""
+        if not self.is_passing:
+            return {}
+
+        last_tests = self.history[-1]
+        if last_tests.exec_stats is None:
+            return {}
+        if "coverage_logs" not in last_tests.exec_stats:
+            return {}
+
+        return last_tests.exec_stats["coverage_logs"][-1]
+
+    @property
+    def latest_errors(self) -> str:
+        """Returns a report of the latest test run errors"""
+        last_tests = self.history[-1]
+
+        # error before tests ran (e.g., imports)
+        if "error" in last_tests.exec_stats:
+            return last_tests.exec_stats["error"]
+
+        if "run_tests_errors" not in last_tests.exec_stats:
+            return ""
+
+        format_err = lambda e: f"{e['type']}: {e['test']}:\n{e['message']}"
+        last_errors = [
+            format_err(e)
+            for errors in last_tests.exec_stats["run_tests_errors"].values()
+            for e in errors
+        ]
+
+        return "\n".join(last_errors)
 
     @property
     def is_passing(self) -> bool:

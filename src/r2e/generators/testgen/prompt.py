@@ -44,3 +44,23 @@ Enclose your code within code delimiters, for example: \n```python\n# YOUR CODE 
 
 
 OVERSAMPLE_MESSAGE = "Please generate more tests for this function."
+
+FIX_ERROR_MESSAGE = """{feedback}
+
+Your previously generated test failed to execute.
+First write a short review the original test and the trace of the failure.
+Then write a new test that addresses the issues with the original test.
+Do not simply copy the original test or just the changes. Write a single complete 
+test that addresses the issues with the original test.
+Enclose your code within code delimiters, for example: \n```python\n# YOUR CODE HERE\n```
+"""
+
+IMPROVE_COVERAGE_MESSAGE = """{feedback}
+
+Your previously generated test is correct but has low branch coverage.
+First write a short review of the coverage report that contains annotations of the uncovered segments of code. 
+Then write a new test that aims to cover the unexecuted lines and branches.
+Do not simply copy the original test or just the changes. Write a single complete
+test that aims to improve the coverage.
+Enclose your code within code delimiters, for example: \n```python\n# YOUR CODE HERE\n```
+"""
