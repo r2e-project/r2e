@@ -7,7 +7,7 @@ from r2e.paths import REPOS_DIR
 from r2e.repo_builder.repo_args import RepoArgs
 
 
-def main(repo_args: RepoArgs):
+def generate_dockerfile(repo_args: RepoArgs):
     with open("r2e/repo_builder/docker_builder/r2e_base_dockerfile.txt", "r") as f:
         dockerfile = f.read()
 
@@ -25,12 +25,13 @@ def main(repo_args: RepoArgs):
             f"RUN python3 parallel_installer.py {i} {i+batch_size} {batch_size}\n\n"
         )
 
-    with open(
-        "r2e/repo_builder/docker_builder/r2e_final_dockerfile.dockerfile", "w"
-    ) as f:
+    DOCKERFILE_PATH = REPOS_DIR / "r2e_final_dockerfile.dockerfile"
+    with open(DOCKERFILE_PATH, "w") as f:
         f.write(dockerfile)
+
+    print("Dockerfile generated at: ", DOCKERFILE_PATH)
 
 
 if __name__ == "__main__":
     repo_args = fire.Fire(RepoArgs)
-    main(repo_args)
+    generate_dockerfile(repo_args)
