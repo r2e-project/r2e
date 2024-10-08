@@ -6,6 +6,7 @@ import json
 import textwrap
 
 from r2e.repo_builder import RepoArgs, SetupRepos, build_functions_and_methods
+from r2e.repo_builder.docker_builder import generate_dockerfile
 from r2e.generators.testgen import TestGenArgs, R2ETestGenerator, GenExecArgs, R2EGenExec
 from r2e.execution.args import ExecutionArgs
 from r2e.execution.execute import EquivalenceTestRunner
@@ -43,6 +44,7 @@ def setup(**kwargs):
 # if local mode, then suggest user to install the repo in the r2e environment
 @r2e.command()
 @click.option('--local', is_flag=True, default=False, help="Whether to run the build locally. Default is building a Docker image.")
+@click.option('--install-batch-size', '-k', default=10, type=int, help="Number of repositories to install in parallel in the Docker container.")
 def build(local):
     """Build a Docker image for your experiment."""
     if local:
