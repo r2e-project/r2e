@@ -4,9 +4,9 @@ import click
 import ast
 import json
 import textwrap
+import subprocess
 
-from r2e.repo_builder import RepoArgs, SetupRepos, build_functions_and_methods
-from r2e.repo_builder.docker_builder import generate_dockerfile
+from r2e.repo_builder import RepoArgs, SetupRepos, build_functions_and_methods, generate_dockerfile
 from r2e.generators.testgen import TestGenArgs, R2ETestGenerator, GenExecArgs, R2EGenExec
 from r2e.execution.args import ExecutionArgs
 from r2e.execution.execute import EquivalenceTestRunner
@@ -14,7 +14,7 @@ from r2e.execution.execute import EquivalenceTestRunner
 from r2e.utils.data import load_functions, load_functions_under_test
 from r2e.models import *
 
-from r2e.paths import EXTRACTED_DATA_DIR, TESTGEN_DIR, EXECUTION_DIR
+from r2e.paths import REPOS_DIR, EXTRACTED_DATA_DIR, TESTGEN_DIR, EXECUTION_DIR
 
 @click.group()
 def r2e():
@@ -43,22 +43,52 @@ def setup(**kwargs):
 # TODO: r2e install/build command for docker building
 # if local mode, then suggest user to install the repo in the r2e environment
 @r2e.command()
+@click.option('--exp_id', '-e', default="temp", help="Experiment ID used for identifying the Docker image")
 @click.option('--local', is_flag=True, default=False, help="Whether to run the build locally. Default is building a Docker image.")
 @click.option('--install-batch-size', '-k', default=10, type=int, help="Number of repositories to install in parallel in the Docker container.")
-def build(local):
+def build(**kwargs):
     """Build a Docker image for your experiment."""
-    if local:
+    repo_count = len([d for d in os.listdir(REPOS_DIR) if os.path.isdir(os.path.join(REPOS_DIR, d))])
+    if repo_count == 0:
+        click.echo("No repositories found in the repos directory. Please run the setup command first.")
+        return
+    
+    click.echo(f"Found {repo_count} repositories in the repos directory.")
+    
+    if kwargs['local']:
         click.echo("Running in local mode.")
-        click.secho("WARNING: Please manually install repositories in the r2e virtual env.", fg="yellow")
+        click.secho("WARNING: If using `local` mode, please install repositories in the below directory manually.", fg="yellow")
+        click.echo(f"    Repos directory path: {REPOS_DIR}")
+        click.echo("    Note: Ensure you're installing in the r2e virtual env.")
+
     else:
         click.echo("Running in Docker mode.")
         click.echo("Creating a dockerfile...")
-        # >> python r2e_dockerfile_builder.py --instal_batch_size k (TODO: call the API)
-        # >> path_to_dockerfile = DOCKERFILE_DIR / "r2e_final_dockerfile.dockerfile"
-        # click.echo("Building the Docker image...")
-        # # warn that this will take a while; suggest to run in tmux if possible
-        # >> cd REPOS_DIR
-        # >> docker build -t r2e:<exp_id> -f path_to_dockerfile .
+        generate_dockerfile(RepoArgs(**kwargs))
+    
+        click.secho("WARNING: Building the image will take a while (recommended: Use tmux). Continue? [y/n]", fg="yellow")        
+        if input().lower() != 'y':
+            click.echo("Exiting...")
+            return
+        
+        click.echo("\nBuilding the Docker image...")
+        
+        click.secho(f"WARNING: All {repo_count} repos will be installed in the container. Continue? [y/n]", fg="yellow")
+        if input().lower() != 'y':
+            click.echo("Exiting...")
+            return
+        
+        exp_id = kwargs['exp_id']
+        path_to_dockerfile = REPOS_DIR / "r2e_final_dockerfile.dockerfile"
+        cmd = f"docker build -t r2e:{exp_id} -f {path_to_dockerfile} ."
+        
+        try:
+            subprocess.run(cmd, shell=True, check=True, cwd=REPOS_DIR)
+        except subprocess.CalledProcessError as e:
+            click.secho(f"Error building the Docker image: {e}", fg="red")
+            return
+    
+        click.secho("\nDocker image built successfully.", fg="green")
 
 
 ################### r2e extract ###################
