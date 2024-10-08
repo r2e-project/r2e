@@ -41,19 +41,22 @@ def setup(**kwargs):
 
 # TODO: r2e install/build command for docker building
 # if local mode, then suggest user to install the repo in the r2e environment
-# @r2e.command()
-# def build():
-#     """Build the Docker image."""
-#     if local:
-#         click.echo("Please manually install repositories in the r2e environment.")
-#     else:
-#         click.echo("Creating a dockerfile...")
-#         >> python r2e_dockerfile_builder.py --instal_batch_size k (TODO: call the API)
-#         >> path_to_dockerfile = DOCKERFILE_DIR / "r2e_final_dockerfile.dockerfile"
-#         click.echo("Building the Docker image...")
-#         # warn that this will take a while; suggest to run in tmux if possible
-#         >> cd REPOS_DIR
-#         >> docker build -t r2e:<exp_id> -f path_to_dockerfile .
+@r2e.command()
+@click.option('--local', is_flag=True, default=False, help="Whether to run the build locally. Default is building a Docker image.")
+def build(local):
+    """Build a Docker image for your experiment."""
+    if local:
+        click.echo("Running in local mode.")
+        click.secho("WARNING: Please manually install repositories in the r2e virtual env.", fg="yellow")
+    else:
+        click.echo("Running in Docker mode.")
+        click.echo("Creating a dockerfile...")
+        # >> python r2e_dockerfile_builder.py --instal_batch_size k (TODO: call the API)
+        # >> path_to_dockerfile = DOCKERFILE_DIR / "r2e_final_dockerfile.dockerfile"
+        # click.echo("Building the Docker image...")
+        # # warn that this will take a while; suggest to run in tmux if possible
+        # >> cd REPOS_DIR
+        # >> docker build -t r2e:<exp_id> -f path_to_dockerfile .
 
 
 ################### r2e extract ###################
