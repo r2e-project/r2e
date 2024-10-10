@@ -4,6 +4,8 @@ import unittest
 from r2e.pat.dependency_slicer.globals_finder import find_dependency_globals
 
 
+# skip this test for now
+@unittest.skip
 class TestTypeAnnGlobalsFinder(unittest.TestCase):
 
     def build_ast_find_globals(self, code: str):

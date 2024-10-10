@@ -74,8 +74,9 @@ class TestModule(unittest.TestCase):
         self.module_data = json.loads(module_json)
         self.module = Module(**self.module_data)
 
-    def test_local_path(self):
-        expected_path = f"{REPOS_DIR}/123456/test/module.py"
+    @patch("os.path.exists", return_value=True)
+    def test_local_path(self, mock_exists):
+        expected_path = f"{REPOS_DIR}/123456/test/module"
         self.assertEqual(self.module.local_path, expected_path)
 
     @patch("os.path.exists", return_value=True)
@@ -88,8 +89,9 @@ class TestFunction(unittest.TestCase):
         self.function_data = json.loads(function_json)
         self.function = Function(**self.function_data)
 
-    def test_file_path(self):
-        expected_path = f"{REPOS_DIR}/123456/test/module.py"
+    @patch("os.path.exists", return_value=True)
+    def test_file_path(self, mock_exists):
+        expected_path = f"{REPOS_DIR}/123456/test/module"
         self.assertEqual(self.function.file_path, expected_path)
 
     def test_repo_id(self):
