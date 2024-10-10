@@ -5,9 +5,12 @@ from r2e.utils.data import load_functions
 from r2e.paths import INTERESTING_FUNCS_DIR
 
 ALL_FUNCTIONS_PATH = INTERESTING_FUNCS_DIR / "all_interesting.json"
-ALL_FUNCTIONS = load_functions(ALL_FUNCTIONS_PATH)
+ALL_FUNCTIONS = (
+    load_functions(ALL_FUNCTIONS_PATH) if ALL_FUNCTIONS_PATH.exists() else []
+)
 
 
+@unittest.skipIf(not ALL_FUNCTIONS_PATH.exists(), "ALL_FUNCTIONS_PATH not found")
 class TestSlicedContextCreator(unittest.TestCase):
 
     def test_sliced_context(self):

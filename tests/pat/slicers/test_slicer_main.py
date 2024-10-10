@@ -11,7 +11,11 @@ from r2e.logger import logger
 from r2e.paths import REPOS_DIR, EXTRACTION_DIR
 
 
-ALL_FUNCTIONS = load_functions(EXTRACTION_DIR / "r2e_v1_extracted.json")
+ALL_FUNCTIONS = (
+    load_functions(EXTRACTION_DIR / "r2e_v1_extracted.json")
+    if (EXTRACTION_DIR / "r2e_v1_extracted.json").exists()
+    else []
+)
 
 
 def get_slice(func_idx: int):
@@ -34,7 +38,7 @@ def get_slice(func_idx: int):
     return slicer.dependency_graph.unparse()
 
 
-# @unittest.skip("Skip for clean stdout")
+@unittest.skipIf(not ALL_FUNCTIONS, "path not found")
 class TestSlicerMain(unittest.TestCase):
 
     # def test_slicer_single(self):
