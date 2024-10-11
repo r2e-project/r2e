@@ -51,7 +51,7 @@ You can use R2E to convert GitHub repositories into environments for programming
 These tests are then executed in the Docker container using R2E's custom testing framework [R2E Test Server](https://github.com/r2e-project/r2e-test-server). This server provides an interface for agents to interact with the built environment and execute arbitrary code. Here are these steps in more detail:
 
 > [!Tip]
-> Configure your paths in the [config.yml](./r2e/config.yml) file. These paths will define where your repositories are located and generated data is stored.
+> Configure your paths in the [config.yml](./src/r2e/config.yml) file. These paths will define all generated data is stored.
 
 
 ### 1. Setup and Extract Functions
