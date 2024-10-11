@@ -88,7 +88,7 @@ r2e extract
 
 R2E builds and installs the repositories in a Docker image. This image is used to execute the generated tests in the next step.
 ```bash
-r2e build --exp_id <experiment_id> --install_batch_size <batch_size for parallel installs in the docker image>
+r2e build --exp_id <experiment_id> --install_batch_size <num parallel installs>
 ```
 
 > [!Note]
