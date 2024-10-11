@@ -61,23 +61,17 @@ These tests are then executed in the Docker container using R2E's custom testing
 Use the following command to clone and setup repositories. It supports cloning from a URL, copying from a local path, or processing a list of URLs or local paths.
 ```bash
 r2e setup 
-    --repo_url <repo_url> 
-    --local_repo_path <local_repo_path> 
-    --repo_urls_file <repo_urls_file> 
-    --cloning_multiprocess <cloning_multiprocess>
+    --repo_url <github_url> 
+    --local_repo_path <path/to/local/repo> 
+    --repo_urls_file <repo_urls_file.json with a list of URLs or local paths> 
+    --cloning_multiprocess <num_processes>
 ```
-
-Replace:
-- `<repo_url>` with the URL of the repository you want to clone.
-- `<local_repo_path>` with the local path of the repository you want to copy.
-- `<repo_urls_file>` with the path to a JSON file containing a list of repository URLs or local paths.
-- `<cloning_multiprocess>` with the number of processes you want to use for cloning or copying.
 
 > [!Note]
 > You only need to provide one of repo_url, local_repo_path, or repo_paths_urls_file. After cloning or copying the repositories, the script will run [PyCG](https://arxiv.org/abs/2103.00587) to generate callgraphs if `--run_pycg` is specified.
 
 #### 1.2 Extract Functions and Methods
-To extract functions and methods, use the following command:
+To extract functions and methods, use the following command. First choose an **experiment ID** for your run that you will reuse in all subsequent steps.
 
 ```bash
 r2e extract
@@ -85,8 +79,6 @@ r2e extract
     --extraction_multiprocess <num_processes>
     --overwrite_extracted
 ```
-
-Replace `<experiment_id>` with your experiment ID and `<num_processes>` with the number of processes you want to use for extraction.
 
 > [!Note]
 > The script will find all directories in the REPOS_DIR directory (where your repos were cloned), and extract functions and methods from them. The extracted functions and methods are written to a JSON file in the EXTRACTION_DIR directory. If the extraction file already exists, the script will not overwrite it unless you set --overwrite_extracted to True.
@@ -96,10 +88,8 @@ Replace `<experiment_id>` with your experiment ID and `<num_processes>` with the
 
 R2E builds and installs the repositories in a Docker image. This image is used to execute the generated tests in the next step.
 ```bash
-r2e build --exp_id <experiment_id> --install_batch_size <install_batch_size>
+r2e build --exp_id <experiment_id> --install_batch_size <batch_size for parallel installs in the docker image>
 ```
-
-Replace `<experiment_id>` with your experiment ID and `<install_batch_size>` with the batch size for installing the repositories in parallel in the Docker image.
 
 > [!Note]
 > The dockerfile will copy all the directories in the REPOS_DIR directory (where your repos were cloned) to the Docker image. It will then install the repositories using a combination of [`pdm`](pdm-project.org) and `pip` install commands. The Docker image is stored in the [docker_builder](./r2e/repo_builder/docker_builder) directory.
