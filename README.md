@@ -68,10 +68,10 @@ r2e setup
 ```
 
 Replace:
-- <repo_url> with the URL of the repository you want to clone.
-- <local_repo_path> with the local path of the repository you want to copy.
-- <repo_urls_file> with the path to a JSON file containing a list of repository URLs or local paths.
-- <cloning_multiprocess> with the number of processes you want to use for cloning or copying.
+- `<repo_url>` with the URL of the repository you want to clone.
+- `<local_repo_path>` with the local path of the repository you want to copy.
+- `<repo_urls_file>` with the path to a JSON file containing a list of repository URLs or local paths.
+- `<cloning_multiprocess>` with the number of processes you want to use for cloning or copying.
 
 > [!Note]
 > You only need to provide one of repo_url, local_repo_path, or repo_paths_urls_file. After cloning or copying the repositories, the script will run [PyCG](https://arxiv.org/abs/2103.00587) to generate callgraphs if `--run_pycg` is specified.
@@ -86,7 +86,7 @@ r2e extract
     --overwrite_extracted
 ```
 
-Replace <experiment_id> with your experiment ID and <num_processes> with the number of processes you want to use for extraction.
+Replace `<experiment_id>` with your experiment ID and `<num_processes>` with the number of processes you want to use for extraction.
 
 > [!Note]
 > The script will find all directories in the REPOS_DIR directory (where your repos were cloned), and extract functions and methods from them. The extracted functions and methods are written to a JSON file in the EXTRACTION_DIR directory. If the extraction file already exists, the script will not overwrite it unless you set --overwrite_extracted to True.
@@ -99,7 +99,7 @@ R2E builds and installs the repositories in a Docker image. This image is used t
 r2e build --exp_id <experiment_id> --install_batch_size <install_batch_size>
 ```
 
-Replace <experiment_id> with your experiment ID and <install_batch_size> with the batch size for installing the repositories in parallel in the Docker image.
+Replace `<experiment_id>` with your experiment ID and `<install_batch_size>` with the batch size for installing the repositories in parallel in the Docker image.
 
 > [!Note]
 > The dockerfile will copy all the directories in the REPOS_DIR directory (where your repos were cloned) to the Docker image. It will then install the repositories using a combination of [`pdm`](pdm-project.org) and `pip` install commands. The Docker image is stored in the [docker_builder](./r2e/repo_builder/docker_builder) directory.
