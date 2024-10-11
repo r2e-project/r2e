@@ -142,7 +142,7 @@ python r2e/generators/specgen/generate.py
 ```
 
 > [!Note]
-> The input file must be functions that _have been executed_ using tests from the previous section. The results of execution, such as I/O examples, type signatures, etc., are provided to the LLM for refinement. More details on this in our [paper](r2e.dev/pdfs/r2e_paper.pdf).
+> The input file must be functions that _have been executed_ using tests from the previous section. The results of execution, such as I/O examples, type signatures, etc., are provided to the LLM for refinement. More details on this in our [paper](https://r2e.dev/pdfs/paper.pdf).
 
 
 ---
