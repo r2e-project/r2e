@@ -3,7 +3,8 @@ import re
 import numpy as np
 from collections import Counter
 
-from r2e.utils.data import load_functions_under_test
+from r2e.utils.data import *
+from r2e.paths import *
 
 
 class TestGenEvaluator:
@@ -190,7 +191,8 @@ class TestGenEvaluator:
             print(f" - {label} > 10: {(data_array > 10).sum()}")
 
 
-def main(file_path):
+def summarize(exp_id):
+    file_path = EXECUTION_DIR / f"{exp_id}_out.json"
     evaluator = TestGenEvaluator(file_path)
     evaluator.evaluate()
 
@@ -233,4 +235,4 @@ def main(file_path):
 
 
 if __name__ == "__main__":
-    fire.Fire(main)
+    fire.Fire(summarize)
