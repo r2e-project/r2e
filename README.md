@@ -59,7 +59,6 @@ r2e setup
     --repo_url <github_url> 
     --local_repo_path <path/to/local/repo> 
     --repo_urls_file <repo_urls_file.json with a list of URLs or local paths> 
-    --cloning_multiprocess <num_processes>
 ```
 
 > [!Note]
@@ -69,10 +68,7 @@ r2e setup
 To extract functions and methods, use the following command. First choose an **experiment ID** for your run that you will reuse in all subsequent steps.
 
 ```bash
-r2e extract
-    --exp_id <experiment_id> 
-    --extraction_multiprocess <num_processes>
-    --overwrite_extracted
+r2e extract --exp_id <experiment_id> --overwrite_extracted
 ```
 
 > [!Note]
