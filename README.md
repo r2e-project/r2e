@@ -45,14 +45,9 @@ uv sync
 
 ## Converting Repositories to Environments
 
-You can use R2E to convert GitHub repositories into environments for programming agents. First, R2E builds and installs the repository in a Docker image. Then, we extract the functions and methods from the repository and generate
-**Equivalence Tests** for them.
+R2E provides a convenient CLI to work with. The usual steps are as follows: (1) setup and extract functions and methods from the repositories, (2) build and install repositories, (3) generate **Equivalence Tests** for them, and (4) execute and evaluate the generated tests.
 
-These tests are then executed in the Docker container using R2E's custom testing framework [R2E Test Server](https://github.com/r2e-project/r2e-test-server). This server provides an interface for agents to interact with the built environment and execute arbitrary code. Here are these steps in more detail:
-
-> [!Tip]
-> Configure your paths in the [config.yml](./src/r2e/config.yml) file. These paths will define all generated data is stored.
-
+R2E uses a custom testing framework [R2E Test Server](https://github.com/r2e-project/r2e-test-server) that provides an interface for agents to interact with the built environment and execute arbitrary code.
 
 ### 1. Setup and Extract Functions
 
