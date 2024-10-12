@@ -29,6 +29,9 @@ class OpenAIRunner(BaseRunner):
             "timeout": args.openai_timeout,
         }
 
+    def config(self):
+        return self.client_kwargs
+
     def _run_single(self, payload: list[dict[str, str]]) -> list[str]:
         assert isinstance(payload, list)
 
