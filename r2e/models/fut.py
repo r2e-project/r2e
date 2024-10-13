@@ -25,7 +25,7 @@ class BaseUnderTest(BaseModel):
         return self.test_history.latest_exec_stats
 
     @property
-    def coverage(self) -> float:
+    def coverage(self) -> dict[str, Any]:
         "Returns the coverage of the latest tests"
         return self.test_history.latest_coverage
 

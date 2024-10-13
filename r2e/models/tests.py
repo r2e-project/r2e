@@ -47,7 +47,7 @@ class TestHistory(BaseModel):
         return self.history[-1].exec_stats
 
     @property
-    def latest_coverage(self) -> float:
+    def latest_coverage(self) -> dict[str, Any]:
         """Returns the coverage logs of the latest test run"""
         if not self.is_passing:
             return {}
@@ -64,6 +64,10 @@ class TestHistory(BaseModel):
     def latest_errors(self) -> str:
         """Returns a report of the latest test run errors"""
         last_tests = self.history[-1]
+
+        # if no exec stats, return empty string
+        if last_tests.exec_stats is None:
+            return ""
 
         # error before tests ran (e.g., imports)
         if "error" in last_tests.exec_stats:

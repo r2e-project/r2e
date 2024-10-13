@@ -7,7 +7,7 @@ from r2e.pat.dependency_slicer.globals_finder.bytecode_globals import (
 
 
 # skip this test for now
-@unittest.skip
+@unittest.skip("Local run only yet")
 class TestBytecodeGlobalsFinder(unittest.TestCase):
     def build_ast_get_global_access_symbols(self, code: str):
         node = ast.parse(code).body[0]
