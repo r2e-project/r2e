@@ -16,12 +16,14 @@ class BaseHandler:
         ast_statements: AstStatements,
         search_key: str,
         slicer: "DependencySlicer",
+        depth: int = -1,
     ):
         self.ast_statement = ast_statement
         self.ast_statements = ast_statements
         self.index = self.ast_statement.idx
         self.search_key = search_key
         self.slicer = slicer
+        self.depth = depth
 
     def add_self_to_recursion_stack(self):
         """Add the current function to the recursion stack"""
@@ -76,9 +78,13 @@ class BaseHandler:
 
         ## visit the past statement
         if ast_statements is None:
-            self.slicer.visit(past_statement, self.ast_statements, symbol)
+            self.slicer.visit(
+                past_statement, self.ast_statements, symbol, depth=self.depth - 1
+            )
         else:
-            self.slicer.visit(past_statement, ast_statements, symbol)
+            self.slicer.visit(
+                past_statement, ast_statements, symbol, depth=self.depth - 1
+            )
 
     def _add_globals(self):
         # visit all the global accesses
