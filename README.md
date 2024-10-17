@@ -61,27 +61,9 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 
 ### 1. Setup and Extract
 
-#### 1.1 Setup Repositories
-
-Setup repositories in R2E's workspace with: 
+Setup repositories in R2E's workspace and extract functions and methods from them.
 ```posh
 r2e setup --repo_url https://github.com/google-research/posh-graphs
-```
-<details>
-<summary><code>Output</code></summary>
-
-```
-...
-```
-</details>
-
-> [!Note]
-> We also support copying from a local path, or processing a list of URLs/local paths from a json file.
-
-
-#### 1.2 Extract Functions and Methods
-Choose a unique **experiment ID** that you will reuse in all subsequent steps. Then run:
-```posh
 r2e extract --exp_id quickstart --overwrite_extracted
 ```
 <details>
@@ -93,9 +75,9 @@ r2e extract --exp_id quickstart --overwrite_extracted
 </details>
 
 > [!Note]
-> All directories in REPOS_DIR (where your repos were cloned) are processed. The extracted functions and methods are written to a JSON file in the EXTRACTION_DIR directory. Use `--overwrite_extracted` to overwrite any existing results.
-
-
+> We also support copying from a local path, or processing a list of URLs/local paths from a json file.
+>
+> During extraction all repos cloned into REPOS_DIR are processed. The extracted functions and methods are written to a JSON file in the EXTRACTION_DIR directory. Use `--overwrite_extracted` to overwrite any existing results.
 
 
 ### 2. Build and Install
