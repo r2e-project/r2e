@@ -21,12 +21,12 @@
 ## Installation
 
 1. Install [`uv`](https://docs.astral.sh/uv/) to setup R2E.
-```bash
+```posh
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 2. Create a venv, clone, and install.
-```bash
+```posh
 git clone https://github.com/r2e-project/r2e.git
 cd r2e && uv venv && source .venv/bin/activate
 uv sync
@@ -62,8 +62,8 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 #### 1.1 Setup Repositories
 
 Use the following command to clone and setup repositories in R2E's workspace. 
-```bash
-r2e setup --repo_url https://github.com/google-research/python-graphs
+```posh
+r2e setup --repo_url https://github.com/google-research/posh-graphs
 ```
 
 > [!Note]
@@ -71,7 +71,7 @@ r2e setup --repo_url https://github.com/google-research/python-graphs
 
 #### 1.2 Extract Functions and Methods
 First choose an **experiment ID** for your run that you will reuse in all subsequent steps. Then run:
-```bash
+```posh
 r2e extract --exp_id quickstart --overwrite_extracted
 ```
 
@@ -82,7 +82,7 @@ r2e extract --exp_id quickstart --overwrite_extracted
 ### 2. Build and Install
 
 By default, repositories are installed in a Docker image. This image is used to sandbox execution.
-```bash
+```posh
 r2e build --exp_id quickstart
 ```
 
@@ -100,7 +100,7 @@ r2e build --exp_id quickstart
 ### 3. Generate and Execute Tests
 
 #### 3.1 Generation
-```bash
+```posh
 r2e generate --exp_id quickstart
 ```
 
@@ -110,7 +110,7 @@ r2e generate --exp_id quickstart
 > Several other args are available to control the generation process and language model in [testgen/args.py](./r2e/generators/testgen/args.py).
 
 #### 3.2 Execution
-```bash
+```posh
 r2e execute --exp_id quickstart 
 ```
 
@@ -120,7 +120,7 @@ r2e execute --exp_id quickstart
 
 
 #### 3.3 Evaluation
-```bash
+```posh
 r2e show --exp_id quickstart --summary
 ```
 
