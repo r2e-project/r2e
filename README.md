@@ -10,7 +10,7 @@
   [![Website](https://img.shields.io/badge/website-r2e.dev-blue)](https://r2e.dev)
   [![Paper](https://img.shields.io/badge/paper-ICML%202024-purple)](https://r2e.dev/pdfs/paper.pdf)
   [![Demos](https://img.shields.io/badge/youtube-demos-maroon)](https://www.youtube.com/watch?v=NrTEbwyofAg&list=PLA_lMIaJefMZyZOac67rxwRSjmE8rNZ9v)
-  [![GitHub license](https://img.shields.io/badge/License-MIT-blu.svg)](#license-gh-package)
+  [![GitHub license](https://img.shields.io/badge/License-MIT-blu.svg)](https://lbesson.mit-license.org/)
 </div>
 
 ---
