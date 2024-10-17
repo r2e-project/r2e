@@ -46,7 +46,7 @@ R2E introduces **Equivalence Tests**, a test that checks if two pieces of code a
 Find more details and examples at [r2e.dev](https://r2e.dev) and in our [paper](https://r2e.dev/pdfs/paper.pdf).
 
 
-## Quickstart
+## Usage
 
 R2E provides a convenient CLI to work with. The usual steps are as follows: 
 (1) [setup and extract functions from repositories](#1-setup-and-extract), 
