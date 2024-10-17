@@ -61,17 +61,16 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 
 #### 1.1 Setup Repositories
 
-Use the following command to clone and setup repositories. 
+Use the following command to clone and setup repositories in R2E's workspace. 
 ```bash
 r2e setup --repo_url https://github.com/google-research/python-graphs
 ```
 
 > [!Note]
-> We also support cloning from a URL, copying from a local path, or processing a list of URLs or local paths from a json file.
+> We also support copying from a local path, or processing a list of URLs or local paths from a json file.
 
 #### 1.2 Extract Functions and Methods
-To extract functions and methods, use the following command. First choose an **experiment ID** for your run that you will reuse in all subsequent steps.
-
+First choose an **experiment ID** for your run that you will reuse in all subsequent steps. Then run:
 ```bash
 r2e extract --exp_id <experiment_id> --overwrite_extracted
 ```
@@ -82,16 +81,21 @@ r2e extract --exp_id <experiment_id> --overwrite_extracted
 
 ### 2. Build and Install
 
-R2E builds and installs the repositories in a Docker image. This image is used to execute the generated tests in the next step.
+By default, repositories are installed in a Docker image. This image is used to sandbox execution.
 ```bash
 r2e build --exp_id <experiment_id> --install_batch_size <num parallel installs>
 ```
 
 > [!Note]
-> The dockerfile will copy all the directories in the REPOS_DIR directory (where your repos were cloned) to the Docker image. It will then install the repositories using a combination of [`pdm`](pdm-project.org) and `pip` install commands. The Docker image is stored in the [docker_builder](./r2e/repo_builder/docker_builder) directory.
+> **Docker Mode:** For a local install use `--local`.
+> This which will suggest the steps you need to take to **manually** install the repo.
 
-> [!Tip]
-> Please follow [http://docs.docker.com/engine/install/](http://docs.docker.com/engine/install/) for instructions on installing docker. It is recommended to follow the post-installation steps to run docker as a non-root user. 
+> [!Note]
+> **Docker Mode:** In docker mode (default), this copies all repos in the REPOS_DIR (where your repos were cloned) to an image.
+> It then attempts installation using [`pdm`](pdm-project.org) and `pip`. The generated dockerfile is stored in the REPOS_DIR.
+>
+> Please follow [http://docs.docker.com/engine/install/](http://docs.docker.com/engine/install/) for instructions on installing docker.
+> It is recommended to follow the post-installation steps to run docker as a non-root user. 
 
 ### 3. Generate and Execute Tests
 
@@ -101,7 +105,9 @@ r2e generate --exp_id <experiment_id>
 ```
 
 > [!Note]
-> This generates the **equivalence tests** for the functions/methods in the input JSON file. R2E generates the tests using a combination of static analysis and prompting language models. Several other args are available to control the generation process and language model in [testgen/args.py](./r2e/generators/testgen/args.py).
+> This generates the **equivalence tests** for the functions/methods in the input JSON file.
+> R2E generates the tests using a combination of static analysis and prompting language models.
+> Several other args are available to control the generation process and language model in [testgen/args.py](./r2e/generators/testgen/args.py).
 
 #### 3.2 Execution
 ```bash
@@ -109,7 +115,8 @@ r2e execute --exp_id <experiment_id>
 ```
 
 > [!Note]
-> The script will execute the generated tests in the Docker container. The results are stored in the [EXECUTION_DIR] directory. 
+> The script will execute the generated tests in the Docker container.
+> The results are stored in the [EXECUTION_DIR] directory. 
 
 
 #### 3.3 Evaluation
@@ -118,7 +125,8 @@ r2e show --exp_id <experiment_id> --summary
 ```
 
 > [!Note]
-> This would give you a summary of the generated tests and their execution results. The evaluator also provides a detailed breakdown of the execution results for each test.
+> This would give you a summary of the generated tests and their execution results.
+> The evaluator also provides a detailed breakdown of the execution results for each test.
 
 
 ## Additional Resources
