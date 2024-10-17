@@ -39,6 +39,7 @@ class DependencySlicer:
         repo: Repo,
         ast_stmt_list: list[AstStatement],
         file_ast_cache: dict[str, AstStatements],
+        depth: int = -1,
     ):
         self.repo = repo
         self.ast_stmt_list = ast_stmt_list
@@ -54,8 +55,12 @@ class DependencySlicer:
 
         self.dependency_graph = DependencyGraph(self.ast_stmt_list)
 
+        self.depth = depth
+
     @classmethod
-    def from_function_models(cls, function_models: Function | list[Function]):
+    def from_function_models(
+        cls, function_models: Function | list[Function], depth: int = -1
+    ):
         function_models = (
             function_models if isinstance(function_models, list) else [function_models]
         )
@@ -82,10 +87,10 @@ class DependencySlicer:
             assert resolved_function is not None
             ast_stmt_list.append(resolved_function)
 
-        return cls(repo, ast_stmt_list, file_ast_cache)
+        return cls(repo, ast_stmt_list, file_ast_cache, depth)
 
     @classmethod
-    def from_class_models(cls, class_models: Class | list[Class]):
+    def from_class_models(cls, class_models: Class | list[Class], depth: int = -1):
         class_models = (
             class_models if isinstance(class_models, list) else [class_models]
         )
@@ -110,26 +115,33 @@ class DependencySlicer:
             assert resolved_class is not None
             ast_stmt_list.append(resolved_class)
 
-        return cls(repo, ast_stmt_list, file_ast_cache)
+        return cls(repo, ast_stmt_list, file_ast_cache, depth)
 
     def run(self):
         for ast_stmt in self.ast_stmt_list:
-            self.visit(ast_stmt, self.file_ast_cache[ast_stmt.file_path])
+            self.visit(
+                ast_stmt, self.file_ast_cache[ast_stmt.file_path], depth=self.depth
+            )
 
     def visit(
         self,
         stmt: AstStatement,
         all_stmts: AstStatements,
         search_key: str = "",
+        depth: int = -1,
     ):
+        if depth == 0:
+            return
+
+        print(f"Visiting {stmt} with depth {depth}")
         if stmt in self.visited_set or stmt in self.recursion_stack:
             return
         for ast_type, handler in HandlersMapping.items():
             if isinstance(stmt.stmt, ast_type):
-                handler_instance = handler(stmt, all_stmts, search_key, self)
+                handler_instance = handler(stmt, all_stmts, search_key, self, depth)
                 handler_instance.handle()
                 return
-        BaseHandler(stmt, all_stmts, search_key, self).handle()
+        BaseHandler(stmt, all_stmts, search_key, self, depth).handle()
         return
 
     def get_file_ast_stmts(self, file_path: str) -> AstStatements:

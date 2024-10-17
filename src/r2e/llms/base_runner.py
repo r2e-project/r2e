@@ -1,3 +1,4 @@
+import json
 from abc import ABC, abstractmethod
 
 from tqdm import tqdm
@@ -24,6 +25,10 @@ class BaseRunner(ABC):
             self.cache.save_cache()
 
     @abstractmethod
+    def config(self) -> dict:
+        pass
+
+    @abstractmethod
     def _run_single(self, payload) -> list[str]:
         return []
 
@@ -36,10 +41,10 @@ class BaseRunner(ABC):
         """
         cache: Cache | None
         call_method: callable  # type: ignore
-        payload, cache, args, call_method = combined_args
+        payload, cache, args, config, call_method = combined_args
 
         if cache is not None:
-            cache_result = cache.get_from_cache(payload)
+            cache_result = cache.get_from_cache(json.dumps([payload, config]))
             if cache_result is not None:
                 return cache_result
 
@@ -50,11 +55,13 @@ class BaseRunner(ABC):
 
     def run_batch(self, payloads: list) -> list[list[str]]:
         outputs = []
+        config = self.config()
         arguments = [
             (
                 payload,
                 self.cache,  ## pass the cache as argument for cache check
                 self.args,  ## pass the args as argument for cache check
+                config,
                 self._run_single,  ## pass the _run_single method as argument because of multiprocessing
             )
             for payload in payloads
@@ -79,7 +86,10 @@ class BaseRunner(ABC):
 
         if self.cache is not None:
             for payload, output in zip(payloads, outputs):
-                self.cache.add_to_cache(payload, output)  ## save the output to cache
+                self.cache.add_to_cache(
+                    json.dumps([payload, config]), output
+                )  ## save the output to cache
+            self.save_cache()
 
         return outputs
 
@@ -91,7 +101,6 @@ class BaseRunner(ABC):
                 payload_batch = payloads[i : i + batch_size]
                 outputs_batch = self.run_batch(payload_batch)
                 outputs.extend(outputs_batch)
-                self.save_cache()
         else:
             outputs = self.run_batch(payloads)
         return outputs

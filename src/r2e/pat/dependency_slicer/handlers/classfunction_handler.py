@@ -94,7 +94,9 @@ class ClassFunctionHandler(BaseHandler):
 
         for new_import in new_imports:
             fake_ast_stmt = self.ast_statements.create_fake_import_aststmt(new_import)
-            self.slicer.visit(fake_ast_stmt, self.ast_statements, "-1")
+            self.slicer.visit(
+                fake_ast_stmt, self.ast_statements, "-1", depth=self.depth - 1
+            )
 
     def _handle(self):
         """
