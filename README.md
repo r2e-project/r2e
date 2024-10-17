@@ -116,29 +116,11 @@ r2e show --exp_id <experiment_id> --summary
 > This would give you a summary of the generated tests and their execution results. The evaluator also provides a detailed breakdown of the execution results for each test.
 
 
-## Building benchmarks with R2E
+## Additional Resources
 
-Relevant Code: [SpecGenerator](./r2e/generators/specgen/generate.py)
+1. **Improving Specifications:**: Find details about improving the specifications of extracted functions to build benchmarks using LLMs @ [Spec Refinement](./r2e/generators/specgen/README.md).
 
-While the user is free to choose the extracted functions to benchmark, we provide some tools and strategies to build robust benchmarks based on our study.
-
-**Improving Specifications:** We believe that natural language docstrings in GitHub repos might
-be ambiguous or under-specified for use in code generation. We provide an automated approach to refine these docstrings using language models by providing them useful information on the observed behavior of the function when executed using the generated test harness
-```bash
-python r2e/generators/specgen/generate.py
-    -i <input_json> 
-    --exp_id <experiment_id>  
-    --multiprocess <num_processes>
-    --cache_batch_size <batch_size_for_caching_llm_calls>
-```
-
-> [!Note]
-> The input file must be functions that _have been executed_ using tests from the previous section. The results of execution, such as I/O examples, type signatures, etc., are provided to the LLM for refinement. More details on this in our [paper](https://r2e.dev/pdfs/paper.pdf).
-
-
----
-
-For more details on the R2E project, refer to [r2e.dev](https://r2e.dev)!
+2. **PAT: Program Analysis Tools**: We developed an in-house program and static analysis toolbox that powers R2E along with LLMs. These tools can be used independently too. Learn more about them @ [PAT](./r2e/pat/README.md).
 
 ## Citation
 
