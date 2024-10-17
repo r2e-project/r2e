@@ -72,7 +72,7 @@ r2e setup --repo_url https://github.com/google-research/python-graphs
 #### 1.2 Extract Functions and Methods
 First choose an **experiment ID** for your run that you will reuse in all subsequent steps. Then run:
 ```bash
-r2e extract --exp_id <experiment_id> --overwrite_extracted
+r2e extract --exp_id quickstart --overwrite_extracted
 ```
 
 > [!Note]
@@ -83,7 +83,7 @@ r2e extract --exp_id <experiment_id> --overwrite_extracted
 
 By default, repositories are installed in a Docker image. This image is used to sandbox execution.
 ```bash
-r2e build --exp_id <experiment_id> --install_batch_size <num parallel installs>
+r2e build --exp_id quickstart --install_batch_size <num parallel installs>
 ```
 
 > [!Note]
@@ -101,7 +101,7 @@ r2e build --exp_id <experiment_id> --install_batch_size <num parallel installs>
 
 #### 3.1 Generation
 ```bash
-r2e generate --exp_id <experiment_id>
+r2e generate --exp_id quickstart
 ```
 
 > [!Note]
@@ -111,7 +111,7 @@ r2e generate --exp_id <experiment_id>
 
 #### 3.2 Execution
 ```bash
-r2e execute --exp_id <experiment_id> 
+r2e execute --exp_id quickstart 
 ```
 
 > [!Note]
@@ -121,7 +121,7 @@ r2e execute --exp_id <experiment_id>
 
 #### 3.3 Evaluation
 ```bash
-r2e show --exp_id <experiment_id> --summary
+r2e show --exp_id quickstart --summary
 ```
 
 > [!Note]
