@@ -81,21 +81,17 @@ r2e extract --exp_id quickstart --overwrite_extracted
 
 ### 2. Build and Install
 
-By default, repositories are installed in a Docker image. This image is used to sandbox execution.
+By default, repositories are installed in a Docker image for sandboxed execution.
 ```posh
 r2e build --exp_id quickstart
 ```
 
 > [!Note]
-> **Docker Mode:** For a local install use `--local`.
+> **Local Mode:** For a local install use `--local`.
 > This which will suggest the steps you need to take to **manually** install the repo.
-
-> [!Note]
-> **Docker Mode:** In docker mode (default), this copies all repos in the REPOS_DIR (where your repos were cloned) to an image.
-> It then attempts installation using [`pdm`](pdm-project.org) and `pip`. The generated dockerfile is stored in the REPOS_DIR.
 >
-> Please follow [http://docs.docker.com/engine/install/](http://docs.docker.com/engine/install/) for instructions on installing docker.
-> It is recommended to follow the post-installation steps to run docker as a non-root user. 
+> **Docker Mode:** In docker mode (default), this copies and installs all repos in the REPOS_DIR (where your repos were cloned) in a docker image using using [`pdm`](pdm-project.org) and `pip`. Find the generated dockerfile in REPOS_DIR.
+> Please follow [http://docs.docker.com/engine/install/](http://docs.docker.com/engine/install/) for instructions on installing docker. It is recommended to follow the post-installation steps to run docker as a non-root user. 
 
 ### 3. Generate and Execute Tests
 
