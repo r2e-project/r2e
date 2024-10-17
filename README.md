@@ -215,34 +215,11 @@ python r2e/generators/testgen/oversample.py
     --cache_batch_size <batch_size_for_caching_llm_calls>
 ```
 
-## Building benchmarks with R2E
+## Additional Resources
 
-Relevant Code: [SpecGenerator](./r2e/generators/specgen/generate.py)
+1. **Improving Specifications:**: Find details about improving the specifications of extracted functions to build benchmarks using LLMs @ [Spec Refinement](./r2e/generators/specgen/README.md).
 
-While the user is free to choose the extracted functions to benchmark code LLMs and programming agents, we provide some tools and strategies to build robust benchmarks based on our study.
-
-**Improving Specifications:** We believe that natural language docstrings in GitHub repos might
-be ambiguous or under-specified for use in code generation. We provide an automated approach to refine these docstrings using language models by providing them useful information on the observed behavior of the function when executed using the generated test harness
-```bash
-python r2e/generators/specgen/generate.py
-    -i <input_json> 
-    --exp_id <experiment_id>  
-    --multiprocess <num_processes>
-    --cache_batch_size <batch_size_for_caching_llm_calls>
-```
-
-> [!Note]
->
-> The input file must be functions that _have been executed_ using tests from the previous section. The results of execution, such as I/O examples, type signatures, etc., are provided to the LLM for refinement. More details on this in our [paper](r2e.dev/pdfs/r2e_paper.pdf).
-
-## Other Details
-
-#### PAT: Program Analysis Tools 
-R2E is powered by a synergistic combination of program analysis and LLMs. We implemented a new toolbox of analysis tools for Python, which we call [⚒ PAT](./r2e/pat). For more details on what these tools enable and how they are used, please refer to the [PAT documentation](./r2e/pat/README.md).
-
----
-
-For more details on the R2E project, refer to [r2e.dev](https://r2e.dev)!
+2. **PAT: Program Analysis Tools**: We developed an in-house program and static analysis toolbox that powers R2E along with LLMs. These tools can be used independently too. Learn more about them @ [PAT](./r2e/pat/README.md).
 
 ## Citation
 
