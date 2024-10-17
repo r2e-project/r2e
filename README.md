@@ -36,7 +36,7 @@ uv sync
 
 ## Key Concept: Equivalence Test Harnesses
 
-R2E introduces the concept of **Equivalence Tests**. An **Equivalence Test** is a test that checks if two pieces of code are equivalent. In the context of R2E, an **Equivalence Test** checks if the output of a function/method in a repository is the same as the output of the generated code for the same function/method.
+R2E introduces **Equivalence Tests**, a test that checks if two pieces of code are equivalent. In the context of R2E, an **Equivalence Test** checks if the output of a function/method in a repository is the same as the output of the generated code for the same function/method. Here's an overview of the key principles of R2E:
 
 | **Principle** | **Description** |
 |---------------|-----------------|
