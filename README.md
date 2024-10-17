@@ -46,20 +46,20 @@ R2E introduces **Equivalence Tests**, a test that checks if two pieces of code a
 Find more details and examples at [r2e.dev](https://r2e.dev) and in our [paper](https://r2e.dev/pdfs/paper.pdf).
 
 
-## Usage
+## Quickstart
 
 R2E provides a convenient CLI to work with. The usual steps are as follows: 
-(1) [setup and extract functions from repositories](#setup-and-extract), 
-(2) [build and install repositories](#build-and-install), and
-(3) [generate and execute **Equivalence Tests**](#generate-and-execute-tests)
+(1) [setup and extract functions from repositories](#1-setup-and-extract), 
+(2) [build and install repositories](#2-build-and-install), and
+(3) [generate and execute **Equivalence Tests**](#3-generate-and-execute-tests)
 
 <!-- Find the complete CLI documentation at [./docs/cli.md](./docs/cli.md). -->
 
 <!-- Note: R2E uses a custom testing framework [R2E Test Server](https://github.com/r2e-project/r2e-test-server) that provides an interface for agents to interact with the built environment and execute arbitrary code. -->
 
-### 1. Setup and Extract Functions
+### 1. Setup and Extract
 
-#### 1.1 Clone and Setup Repositories
+#### 1.1 Setup Repositories
 
 Use the following command to clone and setup repositories. It supports cloning from a URL, copying from a local path, or processing a list of URLs or local paths.
 ```bash
@@ -83,7 +83,7 @@ r2e extract --exp_id <experiment_id> --overwrite_extracted
 > The script will find all directories in the REPOS_DIR directory (where your repos were cloned), and extract functions and methods from them. The extracted functions and methods are written to a JSON file in the EXTRACTION_DIR directory. If the extraction file already exists, the script will not overwrite it unless you set --overwrite_extracted to True.
 
 
-### 2. Build Repositories (in Docker)
+### 2. Build and Install
 
 R2E builds and installs the repositories in a Docker image. This image is used to execute the generated tests in the next step.
 ```bash
@@ -96,7 +96,7 @@ r2e build --exp_id <experiment_id> --install_batch_size <num parallel installs>
 > [!Tip]
 > Please follow [http://docs.docker.com/engine/install/](http://docs.docker.com/engine/install/) for instructions on installing docker. It is recommended to follow the post-installation steps to run docker as a non-root user. 
 
-### 3. Generate Equivalence Test Harnesses
+### 3. Generate and Execute Tests
 
 #### 3.1 Generation
 ```bash
