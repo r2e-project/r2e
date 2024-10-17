@@ -48,11 +48,16 @@ R2E introduces **Equivalence Tests**, a test that checks if two pieces of code a
 Find more details and examples at [r2e.dev](https://r2e.dev) and in our [paper](https://r2e.dev/pdfs/paper.pdf).
 
 
-## Converting Repositories to Environments
+## Usage
 
-R2E provides a convenient CLI to work with. The usual steps are as follows: (1) setup and extract functions and methods from the repositories, (2) build and install repositories, (3) generate **Equivalence Tests** for them, and (4) execute and evaluate the generated tests.
+R2E provides a convenient CLI to work with. The usual steps are as follows: 
+(1) [setup and extract functions from repositories](#setup-and-extract), 
+(2) [build and install repositories](#build-and-install), and
+(3) [generate and execute **Equivalence Tests**](#generate-and-execute-tests)
 
-R2E uses a custom testing framework [R2E Test Server](https://github.com/r2e-project/r2e-test-server) that provides an interface for agents to interact with the built environment and execute arbitrary code.
+<!-- Find the complete CLI documentation at [./docs/cli.md](./docs/cli.md). -->
+
+<!-- Note: R2E uses a custom testing framework [R2E Test Server](https://github.com/r2e-project/r2e-test-server) that provides an interface for agents to interact with the built environment and execute arbitrary code. -->
 
 ### 1. Setup and Extract Functions
 
