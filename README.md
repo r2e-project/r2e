@@ -57,51 +57,78 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 
 <!-- Note: R2E uses a custom testing framework [R2E Test Server](https://github.com/r2e-project/r2e-test-server) that provides an interface for agents to interact with the built environment and execute arbitrary code. -->
 
+
+
 ### 1. Setup and Extract
 
 #### 1.1 Setup Repositories
 
-Use the following command to clone and setup repositories in R2E's workspace. 
+Setup repositories in R2E's workspace with: 
 ```posh
 r2e setup --repo_url https://github.com/google-research/posh-graphs
 ```
+<details>
+<summary><code>Output</code></summary>
+
+```
+...
+```
+</details>
 
 > [!Note]
-> We also support copying from a local path, or processing a list of URLs or local paths from a json file.
+> We also support copying from a local path, or processing a list of URLs/local paths from a json file.
+
 
 #### 1.2 Extract Functions and Methods
-First choose an **experiment ID** for your run that you will reuse in all subsequent steps. Then run:
+Choose a unique **experiment ID** that you will reuse in all subsequent steps. Then run:
 ```posh
 r2e extract --exp_id quickstart --overwrite_extracted
 ```
+<details>
+<summary><code>Output</code></summary>
+
+```
+...
+```
+</details>
 
 > [!Note]
-> The script will find all directories in the REPOS_DIR directory (where your repos were cloned), and extract functions and methods from them. The extracted functions and methods are written to a JSON file in the EXTRACTION_DIR directory. If the extraction file already exists, the script will not overwrite it unless you set --overwrite_extracted to True.
+> All directories in REPOS_DIR (where your repos were cloned) are processed. The extracted functions and methods are written to a JSON file in the EXTRACTION_DIR directory. Use `--overwrite_extracted` to overwrite any existing results.
+
+
 
 
 ### 2. Build and Install
 
-By default, repositories are installed in a Docker image for sandboxed execution.
+**Docker Mode:** By default, all repos in REPOS_DIR are installed in a Docker image for sandboxed execution. Find the generated dockerfile in REPOS_DIR. Useful reference: [installing docker](http://docs.docker.com/engine/install/)
 ```posh
 r2e build --exp_id quickstart
 ```
+<details>
+<summary><code>Output</code></summary>
 
-> [!Note]
-> **Local Mode:** For a local execution use `--local`.
-> It will suggest the steps ***you need to take to manually*** to install repos.
->
-> **Docker Mode:** In docker mode (default), this copies and installs all repos in REPOS_DIR (where your repos were cloned) in an image using [`pdm`](pdm-project.org) and `pip`. Find the generated dockerfile in REPOS_DIR.
-> Useful references: (1) [installing docker](http://docs.docker.com/engine/install/). 
+```
+...
+```
+</details>
+
+**Local Mode:** Use `--local` which will suggest the steps ***you need to take to manually*** to install repos.
+```posh
+r2e build --exp_id quickstart --local
+```
+<details>
+<summary><code>Output</code></summary>
+
+```
+...
+```
+</details>
 
 ### 3. Generate and Execute Tests
 
-#### 3.1 Generation
 ```posh
 r2e generate --exp_id quickstart
 ```
-
-> [!Note]
-> Several other args to control the generation process and language model are in [testgen/args.py](./r2e/generators/testgen/args.py).
 
 #### 3.2 Execution
 ```posh
@@ -111,16 +138,6 @@ r2e execute --exp_id quickstart
 > [!Note]
 > The generated tests in the Docker container. Use `--local` to execute locally.
 > The results are stored in the [EXECUTION_DIR] directory.
-
-
-#### 3.3 Evaluation
-```posh
-r2e show --exp_id quickstart --summary
-```
-
-> [!Note]
-> This would give you a summary of the generated tests and their execution results.
-> The evaluator also provides a detailed breakdown of the execution results for each test.
 
 
 ## Additional Resources
