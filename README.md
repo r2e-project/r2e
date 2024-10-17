@@ -87,11 +87,11 @@ r2e build --exp_id quickstart
 ```
 
 > [!Note]
-> **Local Mode:** For a local install use `--local`.
-> This which will suggest the steps you need to take to **manually** install the repo.
+> **Local Mode:** For a local execution use `--local`.
+> It will suggest the steps ***you need to take to manually*** to install repos.
 >
-> **Docker Mode:** In docker mode (default), this copies and installs all repos in the REPOS_DIR (where your repos were cloned) in a docker image using using [`pdm`](pdm-project.org) and `pip`. Find the generated dockerfile in REPOS_DIR.
-> Please follow [http://docs.docker.com/engine/install/](http://docs.docker.com/engine/install/) for instructions on installing docker. It is recommended to follow the post-installation steps to run docker as a non-root user. 
+> **Docker Mode:** In docker mode (default), this copies and installs all repos in REPOS_DIR (where your repos were cloned) in an image using [`pdm`](pdm-project.org) and `pip`. Find the generated dockerfile in REPOS_DIR.
+> Useful references: (1) [installing docker](http://docs.docker.com/engine/install/). 
 
 ### 3. Generate and Execute Tests
 
@@ -101,9 +101,7 @@ r2e generate --exp_id quickstart
 ```
 
 > [!Note]
-> This generates the **equivalence tests** for the functions/methods in the input JSON file.
-> R2E generates the tests using a combination of static analysis and prompting language models.
-> Several other args are available to control the generation process and language model in [testgen/args.py](./r2e/generators/testgen/args.py).
+> Several other args to control the generation process and language model are in [testgen/args.py](./r2e/generators/testgen/args.py).
 
 #### 3.2 Execution
 ```posh
@@ -111,8 +109,8 @@ r2e execute --exp_id quickstart
 ```
 
 > [!Note]
-> The script will execute the generated tests in the Docker container.
-> The results are stored in the [EXECUTION_DIR] directory. 
+> The generated tests in the Docker container. Use `--local` to execute locally.
+> The results are stored in the [EXECUTION_DIR] directory.
 
 
 #### 3.3 Evaluation
