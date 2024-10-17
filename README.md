@@ -83,6 +83,9 @@ r2e extract --exp_id quickstart --overwrite_extracted
 ### 2. Build and Install
 
 **Docker Mode:** By default, all repos in REPOS_DIR are installed in a Docker image for sandboxed execution. Find the generated dockerfile in REPOS_DIR. Useful reference: [installing docker](http://docs.docker.com/engine/install/)
+
+**Local Mode:** Use `--local` which will suggest the steps ***you need to take to manually*** to install repos.
+
 ```posh
 r2e build --exp_id quickstart
 ```
@@ -94,17 +97,6 @@ r2e build --exp_id quickstart
 ```
 </details>
 
-**Local Mode:** Use `--local` which will suggest the steps ***you need to take to manually*** to install repos.
-```posh
-r2e build --exp_id quickstart --local
-```
-<details>
-<summary><code>Output</code></summary>
-
-```
-...
-```
-</details>
 
 ### 3. Generate and Execute Tests
 
