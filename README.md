@@ -61,16 +61,13 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 
 #### 1.1 Setup Repositories
 
-Use the following command to clone and setup repositories. It supports cloning from a URL, copying from a local path, or processing a list of URLs or local paths.
+Use the following command to clone and setup repositories. 
 ```bash
-r2e setup 
-    --repo_url <github_url> 
-    --local_repo_path <path/to/local/repo> 
-    --repo_urls_file <repo_urls_file.json with a list of URLs or local paths> 
+r2e setup --repo_url https://github.com/google-research/python-graphs
 ```
 
 > [!Note]
-> You only need to provide one of repo_url, local_repo_path, or repo_paths_urls_file. After cloning or copying the repositories, the script will run [PyCG](https://arxiv.org/abs/2103.00587) to generate callgraphs if `--run_pycg` is specified.
+> We also support cloning from a URL, copying from a local path, or processing a list of URLs or local paths from a json file.
 
 #### 1.2 Extract Functions and Methods
 To extract functions and methods, use the following command. First choose an **experiment ID** for your run that you will reuse in all subsequent steps.
