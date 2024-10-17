@@ -61,7 +61,7 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 
 ### 1. Setup and Extract
 
-Setup repositories in R2E's workspace and extract functions and methods from them.
+First, choose a unique experiment id (e.g., `quickstart`) that you can reuse for the entire workflow. Then setup repositories and extract functions from:
 ```posh
 r2e setup --repo_url https://github.com/google-research/posh-graphs
 r2e extract --exp_id quickstart --overwrite_extracted
