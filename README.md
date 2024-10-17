@@ -83,7 +83,7 @@ r2e extract --exp_id quickstart --overwrite_extracted
 
 By default, repositories are installed in a Docker image. This image is used to sandbox execution.
 ```bash
-r2e build --exp_id quickstart --install_batch_size <num parallel installs>
+r2e build --exp_id quickstart
 ```
 
 > [!Note]
