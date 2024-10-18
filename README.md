@@ -63,7 +63,7 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 
 First, choose a unique experiment id (e.g., `quickstart`) that you can reuse for the entire workflow. Then setup repositories and extract functions from:
 ```posh
-r2e setup -r https://github.com/google-research/posh-graphs
+r2e setup -r https://github.com/google-research/python-graphs
 r2e extract -e quickstart --overwrite_extracted
 ```
 <details>
@@ -71,12 +71,16 @@ r2e extract -e quickstart --overwrite_extracted
 
 ```
 Cloning repository https://github.com/google-research/python-graphs
-Repo Location: /home/manishs/buckets/local_repoeval_bucket/repos/
+Repo Location: /home/user/buckets/local_repoeval_bucket/repos/
 Setup completed successfully.
+
+Result: /home/user/buckets/local_repoeval_bucket/repos
 
 Extracting..: 100%|███████████████████████| 2/2 [00:00<00:00,  8.89it/s]
 Extracted 18 functions and 53 methods
 Extraction completed successfully.
+
+Result: /home/user/buckets/r2e_bucket/extracted_data/quickstart_extracted.json
 ```
 </details>
 
@@ -151,6 +155,8 @@ Starting round 3/3
 Loaded 4 functions under test
 100%|███████████████████████| 4/4 [00:01<00:00,  2.41it/s]
 Reached max rounds. Stopping at round 3
+
+Result: /home/user/buckets/r2e_bucket/execution/quickstart_out.json
 ```
 </details>
 

@@ -22,6 +22,9 @@ def r2e():
     """R2E CLI tool."""
     pass
 
+def show_result_file(file_path):
+    click.secho(f"\nResult: {file_path}", fg="green", bold=True)
+
 ################### r2e setup ###################
 
 @r2e.command()
@@ -37,6 +40,7 @@ def setup(**kwargs):
     """Set up the environment and clone repositories."""
     SetupRepos.clone_and_setup_repos(RepoArgs(**kwargs))
     click.echo("Setup completed successfully.")
+    show_result_file(REPOS_DIR)
 
 
 ################### r2e build ###################
@@ -110,6 +114,7 @@ def extract(**kwargs):
     repo_args = RepoArgs(**kwargs)
     build_functions_and_methods(repo_args)
     click.echo("Extraction completed successfully.")
+    show_result_file(os.path.join(EXTRACTED_DATA_DIR, f"{repo_args.exp_id}_extracted.json"))
 
 
 ################### r2e generate ###################
@@ -164,6 +169,93 @@ def generate(**kwargs):
     test_gen_args = TestGenArgs(**kwargs)
     R2ETestGenerator.generate(test_gen_args)
     click.echo("Test generation completed successfully.")
+    show_result_file(os.path.join(TESTGEN_DIR, f"{test_gen_args.exp_id}_generate.json"))
+
+
+################### r2e execute ###################
+
+def exec_options(f):
+    options = [
+        click.option('--local', is_flag=True, default=False, help="Whether to run the execution service locally. Default is docker."),
+        click.option('--image', default="r2e:temp", help="The name of the docker image in which to run the tests"),
+        click.option('--execution-multiprocess', '-m', default=20, type=int, help="The number of processes to use for executing the functions and methods"),
+        click.option('--port', default=3006, type=int, help="The port to use for the execution service. Default is 3006 for sequential execution. For parallel, port is randomly picked."),
+        click.option('--timeout-per-task', default=180, type=int, help="The timeout for the execution service to complete one task in seconds"),
+        click.option('--batch-size', default=100, type=int, help="The number of functions to run before writing the output to the file")
+    ]
+    for opt in reversed(options):
+        f = opt(f)
+    return f
+
+def _default_in_file_exec(ctx, param, value):
+    if not value:
+        exp_id = ctx.params.get('exp_id')
+        default_file = f"{exp_id}_generate.json"
+        click.echo(f"Warning: --in_file not provided. Using `{default_file}` as per `exp_id`.")
+        return default_file
+    return value
+
+@r2e.command()
+@click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
+@click.option('--function', '-f', default=None, help="Name of the function to show.")
+@click.option('--in-file', '-i', callback=_default_in_file_exec, help="The input file for the test execution")
+@exec_options
+def execute(**kwargs):
+    """Execute the generated equivalence tests."""
+    
+    if kwargs['local']:
+        click.echo(f"Note: Running the execution service locally. Remove --local for docker.")
+        kwargs['image'] = "r2e:temp"
+    elif not kwargs['image']:
+        click.echo(f"Warning: --image not provided. Using `r2e:{kwargs['exp_id']}` as per `exp_id`.")
+        kwargs['image'] = f"r2e:{kwargs['exp_id']}"
+    elif kwargs['image'] == "r2e:temp":
+        click.echo("Warning: Using the default image `r2e:temp`. Use --image for custom image.")
+    else:
+        click.echo(f"Note: Using the provided image: {kwargs['image']}")
+    
+    testgen_file_path = os.path.join(TESTGEN_DIR, kwargs['in_file'])
+    if not os.path.exists(testgen_file_path):
+        click.echo(f"\nNo generated tests found for experiment ID: {kwargs['exp_id']}")
+        return
+        
+    args = ExecutionArgs(**kwargs)
+    EXECUTION_DIR.mkdir(parents=True, exist_ok=True)
+    EquivalenceTestRunner.run(args)
+    click.echo("Test execution completed successfully.")
+    show_result_file(os.path.join(EXECUTION_DIR, f"{args.exp_id}_out.json"))
+
+
+################### r2e genexec ###################
+
+@r2e.command()
+@click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
+@click.option('--function', '-f', default=None, help="Name of the function to show.")
+@click.option('--in-file', '-i', callback=_default_in_file_gen, help="The input file for the genexec agent.")
+@click.option('--max_rounds', '-k', default=3, type=int, help="The maximum number of rounds to run the genexec process")
+@click.option('--min-cov', default=0.8, type=float, help="The minimum branch coverage to consider a test valid")
+@click.option('--min-valid', default=0.8, type=float, help="The minimum percentage of valid problems to achieve in the dataset")
+@gen_options
+@llm_options
+@exec_options
+def genexec(**kwargs):
+    """Generate-and-Execute Agent that iteratively generates and executes tests."""
+    
+    if kwargs['local']:
+        click.echo(f"Note: Running the execution service locally. Remove --local for docker.")
+        kwargs['image'] = "r2e:temp"
+    elif not kwargs['image']:
+        click.echo(f"Warning: --image not provided. Using `r2e:{kwargs['exp_id']}` as per `exp_id`.")
+        kwargs['image'] = f"r2e:{kwargs['exp_id']}"
+    elif kwargs['image'] == "r2e:temp":
+        click.echo("Warning: Using the default image `r2e:temp`. Use --image for custom image.")
+    else:
+        click.echo(f"Note: Using the provided image: {kwargs['image']}")
+    
+    args = GenExecArgs(**kwargs)
+    EXECUTION_DIR.mkdir(parents=True, exist_ok=True)
+    R2EGenExec.genexec(args)
+    show_result_file(os.path.join(EXECUTION_DIR, f"{args.exp_id}_out.json"))
 
 
 ################### r2e list-functions ###################
@@ -227,91 +319,7 @@ def list_functions(exp_id, detailed, limit):
     if not detailed:
         click.echo("\nUse --detailed or -d for more information about each function.")
                     
-
-################### r2e execute ###################
-
-def exec_options(f):
-    options = [
-        click.option('--local', is_flag=True, default=False, help="Whether to run the execution service locally. Default is docker."),
-        click.option('--image', default="r2e:temp", help="The name of the docker image in which to run the tests"),
-        click.option('--execution-multiprocess', '-m', default=20, type=int, help="The number of processes to use for executing the functions and methods"),
-        click.option('--port', default=3006, type=int, help="The port to use for the execution service. Default is 3006 for sequential execution. For parallel, port is randomly picked."),
-        click.option('--timeout-per-task', default=180, type=int, help="The timeout for the execution service to complete one task in seconds"),
-        click.option('--batch-size', default=100, type=int, help="The number of functions to run before writing the output to the file")
-    ]
-    for opt in reversed(options):
-        f = opt(f)
-    return f
-
-def _default_in_file_exec(ctx, param, value):
-    if not value:
-        exp_id = ctx.params.get('exp_id')
-        default_file = f"{exp_id}_generate.json"
-        click.echo(f"Warning: --in_file not provided. Using `{default_file}` as per `exp_id`.")
-        return default_file
-    return value
-
-@r2e.command()
-@click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
-@click.option('--function', '-f', default=None, help="Name of the function to show.")
-@click.option('--in-file', '-i', callback=_default_in_file_exec, help="The input file for the test execution")
-@exec_options
-def execute(**kwargs):
-    """Execute the generated equivalence tests."""
     
-    if kwargs['local']:
-        click.echo(f"Note: Running the execution service locally. Remove --local for docker.")
-        kwargs['image'] = "r2e:temp"
-    elif not kwargs['image']:
-        click.echo(f"Warning: --image not provided. Using `r2e:{kwargs['exp_id']}` as per `exp_id`.")
-        kwargs['image'] = f"r2e:{kwargs['exp_id']}"
-    elif kwargs['image'] == "r2e:temp":
-        click.echo("Warning: Using the default image `r2e:temp`. Use --image for custom image.")
-    else:
-        click.echo(f"Note: Using the provided image: {kwargs['image']}")
-    
-    testgen_file_path = os.path.join(TESTGEN_DIR, kwargs['in_file'])
-    if not os.path.exists(testgen_file_path):
-        click.echo(f"\nNo generated tests found for experiment ID: {kwargs['exp_id']}")
-        return
-        
-    args = ExecutionArgs(**kwargs)
-    EXECUTION_DIR.mkdir(parents=True, exist_ok=True)
-    EquivalenceTestRunner.run(args)
-    click.echo("Test execution completed successfully.")
-
-
-################### r2e genexec ###################
-
-@r2e.command()
-@click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
-@click.option('--function', '-f', default=None, help="Name of the function to show.")
-@click.option('--in-file', '-i', callback=_default_in_file_gen, help="The input file for the genexec agent.")
-@click.option('--max_rounds', '-k', default=3, type=int, help="The maximum number of rounds to run the genexec process")
-@click.option('--min-cov', default=0.8, type=float, help="The minimum branch coverage to consider a test valid")
-@click.option('--min-valid', default=0.8, type=float, help="The minimum percentage of valid problems to achieve in the dataset")
-@gen_options
-@llm_options
-@exec_options
-def genexec(**kwargs):
-    """Generate-and-Execute Agent that iteratively generates and executes tests."""
-    
-    if kwargs['local']:
-        click.echo(f"Note: Running the execution service locally. Remove --local for docker.")
-        kwargs['image'] = "r2e:temp"
-    elif not kwargs['image']:
-        click.echo(f"Warning: --image not provided. Using `r2e:{kwargs['exp_id']}` as per `exp_id`.")
-        kwargs['image'] = f"r2e:{kwargs['exp_id']}"
-    elif kwargs['image'] == "r2e:temp":
-        click.echo("Warning: Using the default image `r2e:temp`. Use --image for custom image.")
-    else:
-        click.echo(f"Note: Using the provided image: {kwargs['image']}")
-    
-    args = GenExecArgs(**kwargs)
-    EXECUTION_DIR.mkdir(parents=True, exist_ok=True)
-    R2EGenExec.genexec(args)
-    
-
 ################### r2e show ###################
 
 @r2e.command()
