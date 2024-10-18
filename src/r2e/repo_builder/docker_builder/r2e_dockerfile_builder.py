@@ -8,7 +8,7 @@ from r2e.repo_builder.repo_args import RepoArgs
 
 
 def generate_dockerfile(repo_args: RepoArgs):
-    with open("r2e/repo_builder/docker_builder/r2e_base_dockerfile.txt", "r") as f:
+    with open("src/r2e/repo_builder/docker_builder/r2e_base_dockerfile.txt", "r") as f:
         dockerfile = f.read()
 
     num_repos = len(os.listdir(REPOS_DIR))
