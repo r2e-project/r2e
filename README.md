@@ -132,7 +132,7 @@ r2e genexec -e quickstart --save_chat
 <summary><code>Output</code></summary>
 
 ```
-Generating contexts: 100%|███████████████████████| 10/10 [00:03<00:00, 20.56it/s, exc=0, p_exp=0, succ=71, timeouts=0]
+Generating contexts: 100%|███████████████████████| 10/10 [00:03<00:00, 20.56it/s]
 
 Starting round 1/3
 100%|███████████████████████| 10/10 [00:13<00:00,  1.36s/it]
