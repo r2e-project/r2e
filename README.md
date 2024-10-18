@@ -123,7 +123,7 @@ r2e          quickstart   28d6f5751dfa   4 minutes ago   10.1GB
 
 ### 3. Generate and Execute Tests
 
-R2E provides a single command that runs a series of `k` generate-execute rounds w/ feedback. The loop continues until `min_valid`% functions reach a `min_cov`% branch coverage. Default values are `k=3`, `min_valid=0.8`, and `min_cov=0.8`.
+R2E provides a single command that runs a series of `k` generate-execute rounds w/ feedback. The loop continues until `min_valid`% functions reach a `min_cov`% branch coverage. Defaults: `k=3`, `min_valid=0.8`, and `min_cov=0.8`.
 
 ```posh
 r2e genexec -e quickstart --save_chat
