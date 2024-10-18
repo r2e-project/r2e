@@ -63,14 +63,20 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 
 First, choose a unique experiment id (e.g., `quickstart`) that you can reuse for the entire workflow. Then setup repositories and extract functions from:
 ```posh
-r2e setup --repo_url https://github.com/google-research/posh-graphs
-r2e extract --exp_id quickstart --overwrite_extracted
+r2e setup -r https://github.com/google-research/posh-graphs
+r2e extract -e quickstart --overwrite_extracted
 ```
 <details>
 <summary><code>Output</code></summary>
 
 ```
-...
+Cloning repository https://github.com/google-research/python-graphs
+Repo Location: /home/manishs/buckets/local_repoeval_bucket/repos/
+Setup completed successfully.
+
+Extracting..: 100%|███████████████████████| 2/2 [00:00<00:00,  8.89it/s, exc=0, p_exp=0, succ=2, timeouts=0]
+Extracted 18 functions and 53 methods
+Extraction completed successfully.
 ```
 </details>
 
@@ -87,30 +93,71 @@ r2e extract --exp_id quickstart --overwrite_extracted
 **Local Mode:** Use `--local` which will suggest the steps ***you need to take to manually*** to install repos.
 
 ```posh
-r2e build --exp_id quickstart
+r2e build -e quickstart
 ```
 <details>
 <summary><code>Output</code></summary>
 
 ```
+Found 1 repositories in the repos directory.
+Running in Docker mode.
+Creating a dockerfile...
+Dockerfile generated at:  /local_repoeval_bucket/repos/r2e_final_dockerfile.dockerfile
 ...
+
+[+] Building 553.2s (16/16) FINISHED                                         docker:default
+ => [internal] load build definition from r2e_final_dockerfile.dockerfile              0.0s
+ => => transferring dockerfile: 2.52kB                                                 0.0s
+ ...
+ => exporting to image                                                                31.0s 
+ => => exporting layers                                                               30.9s 
+ => => writing image sha256:28d6f5751dfac6de9ccd883f0830cf8ac5c88e46df8bd7             0.0s 
+ => => naming to docker.io/library/r2e:quickstart                                      0.0s
+
+$ docker image ls
+REPOSITORY   TAG          IMAGE ID       CREATED         SIZE
+r2e          quickstart   28d6f5751dfa   4 minutes ago   10.1GB
 ```
 </details>
 
 
 ### 3. Generate and Execute Tests
 
-```posh
-r2e generate --exp_id quickstart
-```
+R2E provides a single command that runs a series of `k` generate-execute rounds w/ feedback. The loop continues until `min_valid`% functions reach a `min_cov`% branch coverage. Default values are `k=3`, `min_valid=0.8`, and `min_cov=0.8`.
 
-#### 3.2 Execution
 ```posh
-r2e execute --exp_id quickstart 
+r2e genexec -e quickstart --save_chat
 ```
+<details>
+<summary><code>Output</code></summary>
+
+```
+Generating contexts: 100%|███████████████████████| 10/10 [00:03<00:00, 20.56it/s, exc=0, p_exp=0, succ=71, timeouts=0]
+
+Starting round 1/3
+100%|███████████████████████| 10/10 [00:13<00:00,  1.36s/it]
+Loaded 10 functions under test
+100%|███████████████████████| 10/10 [00:01<00:00,  5.74it/s]
+Round 1 completed. Status: 0.20 good FUTs.
+
+Starting round 2/3
+100%|███████████████████████| 8/8 [00:20<00:00,  2.58s/it]
+Loaded 8 functions under test
+100%|███████████████████████| 8/8 [00:01<00:00,  4.66it/s]
+Round 2 completed. Status: 0.60 good FUTs.
+
+Starting round 3/3
+100%|███████████████████████| 4/4 [00:13<00:00,  3.39s/it]
+Loaded 4 functions under test
+100%|███████████████████████| 4/4 [00:01<00:00,  2.41it/s]
+Reached max rounds. Stopping at round 3
+```
+</details>
 
 > [!Note]
-> The generated tests in the Docker container. Use `--local` to execute locally.
+> You can also run `r2e generate` and `r2e execute` separately.
+>
+> The generated tests are executed in the Docker container. Use `--local` to execute locally.
 > The results are stored in the [EXECUTION_DIR] directory.
 
 

@@ -28,7 +28,7 @@ class ExecutionArgs(BaseModel):
         description="Whether to run the execution service locally",
     )
 
-    function: str = Field(
+    function: str | None = Field(
         None,
         description="A specific function to generate tests for",
     )

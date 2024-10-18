@@ -155,7 +155,7 @@ def _default_in_file_gen(ctx, param, value):
 
 @r2e.command()
 @click.option('--exp_id', '-e', default="temp", help="Experiment ID used for prefixing the generated tests file")
-@click.option('--function', '-f', required=True, help="Name of the function to show.")
+@click.option('--function', '-f', default=None, help="Name of the function to show.")
 @click.option('--in_file', '-i', callback=_default_in_file_gen, help="The input file for the test generator. Defaults to {exp_id}_extracted.json if not provided.")
 @gen_options
 @llm_options
@@ -253,7 +253,7 @@ def _default_in_file_exec(ctx, param, value):
 
 @r2e.command()
 @click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
-@click.option('--function', '-f', required=True, help="Name of the function to show.")
+@click.option('--function', '-f', default=None, help="Name of the function to show.")
 @click.option('--in-file', '-i', callback=_default_in_file_exec, help="The input file for the test execution")
 @exec_options
 def execute(**kwargs):
@@ -285,7 +285,7 @@ def execute(**kwargs):
 
 @r2e.command()
 @click.option('--exp-id', '-e', default="temp", help="The experiment ID used for the test execution")
-@click.option('--function', '-f', required=True, help="Name of the function to show.")
+@click.option('--function', '-f', default=None, help="Name of the function to show.")
 @click.option('--in-file', '-i', callback=_default_in_file_gen, help="The input file for the genexec agent.")
 @click.option('--max_rounds', '-k', default=3, type=int, help="The maximum number of rounds to run the genexec process")
 @click.option('--min-cov', default=0.8, type=float, help="The minimum branch coverage to consider a test valid")
@@ -361,7 +361,7 @@ def show(exp_id, fname, code, test, result, show_all, chat, summary):
         click.echo(textwrap.indent(target_function.code, '    '))
     
     if test or show_all:
-        if not os.path.exists(testgen_file_path) or not os.path.exists(executed_file_path):
+        if not (os.path.exists(testgen_file_path) or os.path.exists(executed_file_path)):
             click.echo(f"\nNo generated tests found for experiment ID: {exp_id}")
             return
 
@@ -373,8 +373,12 @@ def show(exp_id, fname, code, test, result, show_all, chat, summary):
         target_fut = next((fut for fut in functions_under_test if fut.name == fname), None)
         
         if not target_fut:
-            click.echo(f"\nNo generated test found for function '{fname}'.")
-            return
+            if os.path.exists(testgen_file_path):
+                functions_under_test = load_functions_under_test(testgen_file_path)
+                target_fut = next((fut for fut in functions_under_test if fut.name == fname), None)
+            else:
+                click.echo(f"\nNo generated test found for function '{fname}'.")
+                return
 
         click.echo("\nGenerated Test:")
 
@@ -414,10 +418,15 @@ def show(exp_id, fname, code, test, result, show_all, chat, summary):
             return
 
         click.echo("\nChat Messages:")
+        chat_messages = target_executed_fut.test_history.latest_chat_messages
         
-        for chat_messages in target_executed_fut.test_history.latest_chat_messages:
-            click.secho(f"{chat_messages['role'].capitalize()}:", fg="green")
-            truncated_content = '\n'.join(chat_messages['content'].split('\n')[:50])
+        if not chat_messages:
+            click.echo("No chat messages found.")
+            return
+        
+        for message in chat_messages:
+            click.secho(f"{message['role'].capitalize()}:", fg="green")
+            truncated_content = '\n'.join(message['content'].split('\n')[:50])
             click.echo(truncated_content)
 
 if __name__ == '__main__':

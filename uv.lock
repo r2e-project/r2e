@@ -2629,7 +2629,7 @@ requires-dist = [
     { name = "pycg", specifier = ">=0.0.8" },
     { name = "pyright", specifier = ">=1.1.357" },
     { name = "pytest", specifier = ">=8.1.1" },
-    { name = "r2e-test-server", specifier = ">=0.1.5" },
+    { name = "r2e-test-server", specifier = ">=0.1.8" },
     { name = "rich", specifier = ">=13.7.1" },
     { name = "rpyc", specifier = ">=6.0.0" },
     { name = "seaborn", specifier = ">=0.13.2" },
@@ -2644,7 +2644,7 @@ requires-dist = [
 
 [[package]]
 name = "r2e-test-server"
-version = "0.1.5"
+version = "0.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astor" },
@@ -2653,9 +2653,9 @@ dependencies = [
     { name = "rpyc" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/34/75/c97e77c268a9b73089e07d14e7944d8e971ac552c538ab126ed7204bb12c/r2e_test_server-0.1.5.tar.gz", hash = "sha256:96272a4af6c9e0f3642b888398ff6e068713e154a3089acd2e1794b034e96f94", size = 13557 }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/12/aa03cbd22aed2631ea79953838d9b6b8494c89466bb8613c86d0259133d2/r2e_test_server-0.1.8.tar.gz", hash = "sha256:82d4aad1337f84bf1fdd119c1f37f56b4d9712f5163d692eb0b74869242f3169", size = 13837 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c6/40/39e1f5caa807fe3b30f043552445fb71504176c03b4708930247cf375278/r2e_test_server-0.1.5-py3-none-any.whl", hash = "sha256:6f00a33d82e38ab6d884bfbcaec224b4bd40238dc45d2be98e5700cafb665fbf", size = 17840 },
+    { url = "https://files.pythonhosted.org/packages/6e/72/e77a37fc08de33682cd26b319a71fdcc96c8fbcb9023d5510ce93bd681c9/r2e_test_server-0.1.8-py3-none-any.whl", hash = "sha256:5f7ca1ba1564ab76b09d986a8f433959169ec1b1eb9699a8c937dc2a7cf8c3fb", size = 18188 },
 ]
 
 [[package]]

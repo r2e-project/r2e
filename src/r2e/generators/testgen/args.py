@@ -22,7 +22,7 @@ class TestGenArgs(LLMArgs):
         description="The input file for the test generator",
     )
 
-    function: str = Field(
+    function: str | None = Field(
         None,
         description="A specific function to generate tests for",
     )
