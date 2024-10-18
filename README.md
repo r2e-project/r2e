@@ -53,7 +53,7 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 (2) [build and install repositories](#2-build-and-install), and
 (3) [generate and execute **Equivalence Tests**](#3-generate-and-execute-tests)
 
-Find the complete CLI documentation at [./docs/cli.md](./docs/cli.md). Below is a quickstart guide:
+Find the complete CLI documentation at [CLI.md](./docs/CLI.md). Below is a quickstart guide:
 
 
 ### 1. Setup and Extract
@@ -82,14 +82,14 @@ Result: /home/user/buckets/r2e_bucket/extracted_data/quickstart_extracted.json
 </details>
 
 > [!Note]
-> We also support copying from a local path, or processing a list of URLs/local paths from a json file.
+> We also support copying from a local path, or processing a list of URLs/local paths from a json file ([cli docs](./docs/CLI.md)).
 >
-> During extraction all repos cloned into REPOS_DIR are processed. The extracted functions and methods are written to a JSON file in the EXTRACTION_DIR directory. Use `--overwrite_extracted` to overwrite any existing results.
+> During extraction all repos cloned into REPOS_DIR are processed. The extracted functions and methods are written to a JSON file. Use `--overwrite_extracted` to overwrite any existing results.
 
 
 ### 2. Build and Install
 
-**Docker Mode:** By default, all repos in REPOS_DIR are installed in a Docker image for sandboxed execution. Find the generated dockerfile in REPOS_DIR. Useful reference: [installing docker](http://docs.docker.com/engine/install/)
+**Docker Mode:** By default, all repos in REPOS_DIR are installed in a Docker image for sandboxed execution. Find the generated dockerfile in REPOS_DIR. Useful reference: [install docker](http://docs.docker.com/engine/install/)
 
 **Local Mode:** Use `--local` which will suggest the steps ***you need to take to manually*** to install repos.
 
@@ -158,10 +158,9 @@ Result: /home/user/buckets/r2e_bucket/execution/quickstart_out.json
 </details>
 
 > [!Note]
-> You can also run `r2e generate` and `r2e execute` separately.
+> You can also run `r2e generate` and `r2e execute` separately ([cli docs](./docs/CLI.md)).
 >
 > The generated tests are executed in the Docker container. Use `--local` to execute locally.
-> The results are stored in the [EXECUTION_DIR] directory.
 
 
 ## Additional Resources
