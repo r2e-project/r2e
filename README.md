@@ -74,7 +74,7 @@ Cloning repository https://github.com/google-research/python-graphs
 Repo Location: /home/manishs/buckets/local_repoeval_bucket/repos/
 Setup completed successfully.
 
-Extracting..: 100%|███████████████████████| 2/2 [00:00<00:00,  8.89it/s, exc=0, p_exp=0, succ=2, timeouts=0]
+Extracting..: 100%|███████████████████████| 2/2 [00:00<00:00,  8.89it/s]
 Extracted 18 functions and 53 methods
 Extraction completed successfully.
 ```
