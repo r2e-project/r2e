@@ -53,10 +53,7 @@ R2E provides a convenient CLI to work with. The usual steps are as follows:
 (2) [build and install repositories](#2-build-and-install), and
 (3) [generate and execute **Equivalence Tests**](#3-generate-and-execute-tests)
 
-<!-- Find the complete CLI documentation at [./docs/cli.md](./docs/cli.md). -->
-
-<!-- Note: R2E uses a custom testing framework [R2E Test Server](https://github.com/r2e-project/r2e-test-server) that provides an interface for agents to interact with the built environment and execute arbitrary code. -->
-
+Find the complete CLI documentation at [./docs/cli.md](./docs/cli.md). Below is a quickstart guide:
 
 
 ### 1. Setup and Extract
