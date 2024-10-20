@@ -1,6 +1,6 @@
 # Spec Refinement
 
-Relevant Code: [SpecGenerator](./r2e/generators/specgen/generate.py)
+Relevant Code: [SpecGenerator](./src/r2e/generators/specgen/generate.py)
 
 While the user is free to choose the extracted functions to benchmark code LLMs and programming agents, we provide some tools and strategies to build robust benchmarks based on our study.
 

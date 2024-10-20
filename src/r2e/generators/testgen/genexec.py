@@ -21,10 +21,12 @@ class R2EGenExec:
     def genexec(args):
         """Iteratively generate and execute tests for functions"""
         functions = load_functions(EXTRACTED_DATA_DIR / args.in_file)
-        functions = functions[:10]
+        functions = functions[:15]  # TODO: remove this! debug only.
 
         if args.function:
             functions = [f for f in functions if f.name == args.function]
+
+        assert len(functions) > 0, "No functions found for the given input"
 
         final_output_file = EXECUTION_DIR / f"{args.exp_id}_out.json"
         worklist: list[TestGenTask] = R2ETestGenerator.prepare_tasks(args, functions)
