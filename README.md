@@ -10,6 +10,7 @@
   [![Website](https://img.shields.io/badge/website-r2e.dev-blue)](https://r2e.dev)
   [![Paper](https://img.shields.io/badge/paper-ICML%202024-purple)](https://r2e.dev/pdfs/paper.pdf)
   [![Demos](https://img.shields.io/badge/youtube-demos-maroon)](https://www.youtube.com/watch?v=NrTEbwyofAg&list=PLA_lMIaJefMZyZOac67rxwRSjmE8rNZ9v)
+  [![Notebook](https://img.shields.io/badge/usage.ipynb-jupyter?logo=Jupyter&color=gray)](./docs/usage.ipynb)
   [![GitHub license](https://img.shields.io/badge/License-MIT-blu.svg)](https://lbesson.mit-license.org/)
 </div>
 
@@ -165,9 +166,9 @@ Result: /home/user/buckets/r2e_bucket/execution/quickstart_out.json
 
 ## Additional Resources
 
-1. **Improving Specifications:**: Find details about improving the specifications of extracted functions to build benchmarks using LLMs @ [Spec Refinement](./r2e/generators/specgen/README.md).
+1. **Improving Specifications:**: Find details about improving the specifications of extracted functions to build benchmarks using LLMs @ [Spec Refinement](./src/r2e/generators/specgen/README.md).
 
-2. **PAT: Program Analysis Tools**: We developed an in-house program and static analysis toolbox that powers R2E along with LLMs. These tools can be used independently too. Learn more about them @ [PAT](./r2e/pat/README.md).
+2. **PAT: Program Analysis Tools**: We developed an in-house program and static analysis toolbox that powers R2E along with LLMs. These tools can be used independently too. Learn more about them @ [PAT](./src/r2e/pat/README.md).
 
 ## Citation
 

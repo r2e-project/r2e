@@ -37,8 +37,8 @@ dependencies = [
     "tiktoken>=0.6.0",
     "tomlkit>=0.12.4",
     "tqdm>=4.66.2",
-    "vllm>=0.4.1",
     "r2e-test-server>=0.1.8",
+    "click>=8.1.7",
 ]
 
 [build-system]
@@ -47,3 +47,8 @@ build-backend = "hatchling.build"
 
 [project.scripts]
 r2e = "r2e.cli:r2e"
+
+[project.optional-dependencies]
+vllm = [
+    "vllm>=0.6.3.post1",
+]
