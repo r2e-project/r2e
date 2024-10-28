@@ -8,7 +8,7 @@ from openai.types.chat import ChatCompletion
 
 from r2e.llms.llm_args import LLMArgs
 from r2e.llms.base_runner import BaseRunner
-from r2e.llms.language_model import LanguageModel
+from r2e.llms.language_model import LanguageModel, LanguageModelStyle
 
 
 class OpenAIRunner(BaseRunner):
@@ -18,16 +18,22 @@ class OpenAIRunner(BaseRunner):
 
     def __init__(self, args: LLMArgs, model: LanguageModel):
         super().__init__(args, model)
-        self.client_kwargs: dict[str, Any] = {
-            "model": args.model_name,
-            "temperature": args.temperature,
-            "max_tokens": args.max_tokens,
-            "top_p": args.top_p,
-            "frequency_penalty": args.frequency_penalty,
-            "presence_penalty": args.presence_penalty,
-            "n": args.n,
-            "timeout": args.openai_timeout,
-        }
+        if model.style == LanguageModelStyle.OpenAIReasoning:
+            self.client_kwargs: dict[str, Any] = {
+                "model": args.model_name,
+                "max_completion_tokens": args.max_tokens,
+            }
+        else:
+            self.client_kwargs: dict[str, Any] = {
+                "model": args.model_name,
+                "max_tokens": args.max_tokens,
+                "temperature": args.temperature,
+                "top_p": args.top_p,
+                "frequency_penalty": args.frequency_penalty,
+                "presence_penalty": args.presence_penalty,
+                "n": args.n,
+                "timeout": args.openai_timeout,
+            }
 
     def config(self):
         return self.client_kwargs

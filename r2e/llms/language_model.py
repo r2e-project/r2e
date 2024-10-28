@@ -8,6 +8,8 @@ class LanguageModelStyle(Enum):
     """
 
     OpenAI = "openai"
+    OpenAIReasoning = "openai_reasoning"
+
     Gemini = "gemini"
     Claude3 = "claude3"
     VLLM = "vllm"
@@ -92,5 +94,13 @@ LanguageModelList: list[LanguageModel] = [
     LanguageModel(
         model_name="gpt-4o",
         style=LanguageModelStyle.OpenAI,
+    ),
+    LanguageModel(
+        model_name="o1-mini",
+        style=LanguageModelStyle.OpenAIReasoning,
+    ),
+    LanguageModel(
+        model_name="o1-preview",
+        style=LanguageModelStyle.OpenAIReasoning,
     ),
 ]

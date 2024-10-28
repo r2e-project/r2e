@@ -13,7 +13,10 @@ class LLMCompletions:
         assert len(matched_lang_model) == 1
         model = matched_lang_model[0]
 
-        if model.style == LanguageModelStyle.OpenAI:
+        if (
+            model.style == LanguageModelStyle.OpenAI
+            or model.style == LanguageModelStyle.OpenAIReasoning
+        ):
             from r2e.llms.openai_runner import OpenAIRunner
 
             runner = OpenAIRunner(args, model)
