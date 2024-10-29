@@ -71,7 +71,7 @@ class BaseRunner(ABC):
                 self.run_single,
                 arguments,
                 self.args.multiprocess,
-                use_progress_bar=True,
+                use_progress_bar=self.args.use_progress_bar,
             )
             for output in parallel_outputs:
                 if output.is_success():

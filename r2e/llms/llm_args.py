@@ -10,6 +10,10 @@ class LLMArgs(BaseModel):
         None,
         description="Local path to the model and tokenizer",
     )
+    use_progress_bar: bool = Field(
+        True,
+        description="Whether to use the progress bar",
+    )
 
     n: int = Field(
         1,
