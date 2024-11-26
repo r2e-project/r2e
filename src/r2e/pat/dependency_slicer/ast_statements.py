@@ -179,9 +179,10 @@ class AstStatements:
             stmt = stmt_obj.stmt
             if isinstance(stmt, ast.Assign):
                 for target in stmt.targets:
-                    assigned_target = AstStatements.assigned_expr_name_str(target)
-                    if assigned_target is not None:
-                        var_to_stmt_idxs[assigned_target].append(idx)
+                    assigned_targets = AstStatements.assigned_expr_name_str(target)
+                    if assigned_targets is not None:
+                        for assigned_target in assigned_targets:
+                            var_to_stmt_idxs[assigned_target].append(idx)
             elif isinstance(stmt, (ast.AugAssign, ast.AnnAssign)):
                 assigned_target = AstStatements.assigned_expr_name_str(stmt.target)
                 if assigned_target is not None:
@@ -211,13 +212,21 @@ class AstStatements:
         return wildcard_stmt_idxs
 
     @staticmethod
-    def assigned_expr_name_str(expr: ast.expr) -> str | None:
+    def assigned_expr_name_str(expr: ast.expr) -> list[str] | None:
         if isinstance(expr, ast.Name):
-            return expr.id
+            return [expr.id]
         elif isinstance(expr, ast.Attribute):
             return AstStatements.assigned_expr_name_str(expr.value)
         elif isinstance(expr, ast.Subscript):
             return AstStatements.assigned_expr_name_str(expr.value)
+        elif isinstance(expr, (ast.Tuple, ast.List)):
+            assigned_names = []
+            for el in expr.elts:
+                assigned_name = AstStatements.assigned_expr_name_str(el)
+                if assigned_name is not None:
+                    assigned_names.extend(assigned_name)
+            return assigned_names
+
         else:
             return None
 
