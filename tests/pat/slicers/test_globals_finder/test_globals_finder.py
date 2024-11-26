@@ -343,3 +343,17 @@ while i < 10:
 
     def test_namedexpr(self):
         self.compare("(a := b)", ["b"])
+
+    def test_sympy_bug(self):
+        code = r"""
+def test_issue_7117():
+    # See also issue #5031 (hence the evaluate=False in these).
+    e = Eq(x + 1, 2*x)
+    q = Mul(2, e, evaluate=False)
+    assert latex(q) == r"2 \left(x + 1 = 2 x\right)"
+    q = Add(6, e, evaluate=False)
+    assert latex(q) == r"6 + \left(x + 1 = 2 x\right)"
+    q = Pow(e, 2, evaluate=False)
+    assert latex(q) == r"\left(x + 1 = 2 x\right)^{2}"
+"""
+        self.compare(code, ["x", "Eq", "Mul", "latex", "Add", "Pow"])
