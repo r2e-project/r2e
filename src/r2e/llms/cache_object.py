@@ -1,6 +1,6 @@
 import os
 import json
-from diskcache import Cache
+from diskcache import Cache as DiskCache
 
 from r2e.paths import CACHE_PATH, CACHE_DIR
 
@@ -8,7 +8,7 @@ from r2e.paths import CACHE_PATH, CACHE_DIR
 class Cache:
     def __init__(self) -> None:
         os.makedirs(CACHE_DIR, exist_ok=True)
-        self.cache_dict = Cache(CACHE_PATH)
+        self.cache_dict = DiskCache(CACHE_DIR)
 
     @staticmethod
     def process_payload(payload):

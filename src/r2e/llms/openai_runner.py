@@ -18,16 +18,22 @@ class OpenAIRunner(BaseRunner):
 
     def __init__(self, args: LLMArgs, model: LanguageModel):
         super().__init__(args, model)
-        self.client_kwargs: dict[str, Any] = {
-            "model": args.model_name,
-            "temperature": args.temperature,
-            "max_tokens": args.max_tokens,
-            "top_p": args.top_p,
-            "frequency_penalty": args.frequency_penalty,
-            "presence_penalty": args.presence_penalty,
-            "n": args.n,
-            "timeout": args.openai_timeout,
-        }
+        if "o1" in args.model_name:
+            self.client_kwargs: dict[str, Any] = {
+                "model": args.model_name,
+                "max_completion_tokens": args.max_tokens,
+            }
+        else:
+            self.client_kwargs = {
+                "model": args.model_name,
+                "temperature": args.temperature,
+                "max_tokens": args.max_tokens,
+                "top_p": args.top_p,
+                "frequency_penalty": args.frequency_penalty,
+                "presence_penalty": args.presence_penalty,
+                "n": args.n,
+                "timeout": args.openai_timeout,
+            }
 
     def config(self):
         return self.client_kwargs
