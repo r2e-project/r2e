@@ -46,6 +46,11 @@ class OpenAIRunner(BaseRunner):
                 messages=payload,  # type: ignore
                 **self.client_kwargs,
             )
+        except openai.BadRequestError as e:
+            return [
+                f"OpenAI BadRequestError: {e}"
+                for _ in range(self.client_kwargs.get("n", 1))
+            ]
         except (
             openai.APIError,
             openai.RateLimitError,
