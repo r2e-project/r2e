@@ -43,7 +43,7 @@ class VLLMRunner(BaseRunner):
             if self.cache is not None:
                 cache_result = self.cache.get_from_cache(payload)
                 if cache_result is not None:
-                    outputs[payload_index] = cache_result
+                    outputs[payload_index] = cache_result # type: ignore
                     continue
             remaining_payloads.append(payload)
             remaining_indices.append(payload_index)

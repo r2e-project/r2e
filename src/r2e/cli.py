@@ -264,11 +264,11 @@ def extract_signature_and_docstring(code, max_width=100):
     try:
         tree = ast.parse(code)
         function_def = tree.body[0]
-        args = [arg.arg for arg in function_def.args.args]
-        defaults = [ast.unparse(default) for default in function_def.args.defaults]
+        args = [arg.arg for arg in function_def.args.args] # type: ignore
+        defaults = [ast.unparse(default) for default in function_def.args.defaults] # type: ignore
         padded_defaults = [''] * (len(args) - len(defaults)) + defaults
         signature = ', '.join(f'{arg}={default}' if default else arg for arg, default in zip(args, padded_defaults))
-        docstring = ast.get_docstring(function_def)
+        docstring = ast.get_docstring(function_def) # type: ignore
         if docstring:
             docstring = textwrap.shorten(docstring, width=max_width, placeholder="...")
         else:
@@ -390,7 +390,7 @@ def show(exp_id, fname, code, test, result, show_all, chat, summary):
 
         click.echo("\nGenerated Test:")
 
-        for test_name, test_code in target_fut.test_history.latest_tests.items():
+        for test_name, test_code in target_fut.test_history.latest_tests.items(): # type: ignore
             click.echo(f"\n{test_name}:")
             click.echo(textwrap.indent(test_code, '    '))
         
@@ -408,7 +408,7 @@ def show(exp_id, fname, code, test, result, show_all, chat, summary):
 
         click.echo("\nTest Results:")
 
-        for test_name, results in target_executed_fut.exec_stats['run_tests_logs'].items():
+        for test_name, results in target_executed_fut.exec_stats['run_tests_logs'].items(): # type: ignore
             click.echo(f"\n{test_name}:")
             click.echo(json.dumps(results, indent=4))
             click.echo(json.dumps(target_executed_fut.coverage, indent=4))
