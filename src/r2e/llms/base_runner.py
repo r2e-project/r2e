@@ -49,7 +49,8 @@ class BaseRunner(ABC):
                 return cache_result
 
         result = call_method(payload)
-        assert len(result) == args.n
+        if 'o1' not in args.model_name:
+            assert len(result) == args.n
 
         return result
 

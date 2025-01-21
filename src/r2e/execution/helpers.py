@@ -120,3 +120,87 @@ def self_equiv_futs(
 
     valids = [x["valid"] for x in submit_logs["run_tests_logs"].values()]
     return all(valids), submit_error, futs[0]
+
+
+def check_equiv(
+    code: str,
+    fut: FunctionUnderTest | MethodUnderTest,
+    port: int,
+    local: bool = False,
+    image: str = "r2e:temp",
+    reuse_port: bool = False,
+):
+    """Test if the given code is equivalent to the function under test (reference)
+
+    Args:
+        fut (FunctionUnderTest | MethodUnderTest): function under test
+        code (str): code to be tested
+        port (int): port to run the service
+        local (bool, optional): run the service locally. Defaults to False.
+        image (str, optional): docker image to run the service. Defaults to "r2e:temp".
+        reuse_port (bool, optional): reuse the port. Defaults to False.
+    """
+
+    try:
+        simulator, conn = ServiceManager.get_service(fut.repo_id, port, local, image)
+    except Exception as e:
+        print("Service error@", fut.repo_id, repr(e))
+        fut.test_history.update_exec_stats({"error": repr(e)})
+        return False, repr(e), fut
+
+    try:
+        fut = [fut]
+        service = conn.root
+        assert service is not None, "Test service is None"
+
+        repo_data, fut_data, test_data = get_fut_data(fut, local=local)
+        service.setup_repo(repo_data)
+        service.setup_function(fut_data)
+        service.setup_test(test_data)
+
+        init_response = service.init()
+        init_output = str(init_response["output"])
+        init_error = str(init_response["error"])
+
+        ignore_patterns = ["SyntaxWarning: invalid escape sequence", "NameError: "]
+
+        if init_error and not any(p in init_error for p in ignore_patterns):
+            logger.error(f"Init Error:\n{init_error}\n\n")
+            return False, init_error, fut
+
+        # setup codegen mode
+        service.setup_codegen_mode()
+        exec_response = service.execute(code)
+        exec_output = str(exec_response["output"])
+        exec_error = str(exec_response["error"])
+
+        # run equivalence test
+        try:
+            submit_response = service.submit()
+        except Exception as e:
+            logger.error(f"Submit Error:\n{repr(e)}\n\n")
+            return False, repr(e), fut
+
+        submit_error = str(submit_response["error"])
+
+        if "logs" not in submit_response:
+            logger.error(f"Submit Error:\n{submit_error}\n\n")
+            return False, submit_error, fut
+
+        submit_logs = json.loads(submit_response["logs"])
+        submit_logs["output"] = submit_response["output"]
+        valids = [x["valid"] for x in submit_logs["run_tests_logs"].values()]
+        return all(valids), submit_error, submit_logs["run_tests_logs"]
+
+    except Exception as e:
+        tb = traceback.format_exc()
+        pass
+    finally:
+        if simulator:
+            simulator.stop_container()
+        conn.close()
+        if not reuse_port:
+            ServiceManager.close_connection(port)
+
+    print(f"Error:\n{tb}")
+    return False, tb, {"error": tb}
