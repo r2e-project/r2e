@@ -33,7 +33,7 @@ class ExecutionArgs(BaseModel):
         description="A specific function to generate tests for",
     )
 
-    in_file: str = Field(
+    in_file: str | None = Field(
         None,
         description="The input file for the test execution",
     )

@@ -46,7 +46,7 @@ class BaseRunner(ABC):
         if cache is not None:
             cache_result = cache.get_from_cache(json.dumps([payload, config]))
             if cache_result is not None:
-                return cache_result
+                return cache_result # type: ignore
 
         result = call_method(payload)
         if 'o1' not in args.model_name:
@@ -72,7 +72,7 @@ class BaseRunner(ABC):
                 self.run_single,
                 arguments,
                 self.args.multiprocess,
-                use_progress_bar=True,
+                use_progress_bar=self.args.use_progress_bar,
             )
             for output in parallel_outputs:
                 if output.is_success():

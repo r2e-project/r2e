@@ -186,7 +186,7 @@ class AstStatements:
             elif isinstance(stmt, (ast.AugAssign, ast.AnnAssign)):
                 assigned_target = AstStatements.assigned_expr_name_str(stmt.target)
                 if assigned_target is not None:
-                    var_to_stmt_idxs[assigned_target].append(idx)
+                    var_to_stmt_idxs[assigned_target].append(idx) # type: ignore
             elif isinstance(
                 stmt, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)
             ):

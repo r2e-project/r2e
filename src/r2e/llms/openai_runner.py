@@ -8,7 +8,7 @@ from openai.types.chat import ChatCompletion
 
 from r2e.llms.llm_args import LLMArgs
 from r2e.llms.base_runner import BaseRunner
-from r2e.llms.language_model import LanguageModel
+from r2e.llms.language_model import LanguageModel, LanguageModelStyle
 
 
 class OpenAIRunner(BaseRunner):
@@ -18,16 +18,16 @@ class OpenAIRunner(BaseRunner):
 
     def __init__(self, args: LLMArgs, model: LanguageModel):
         super().__init__(args, model)
-        if "o1" in args.model_name:
+        if model.style == LanguageModelStyle.OpenAIReasoning:
             self.client_kwargs: dict[str, Any] = {
                 "model": args.model_name,
                 "max_completion_tokens": args.max_tokens,
             }
         else:
-            self.client_kwargs = {
+            self.client_kwargs: dict[str, Any] = {
                 "model": args.model_name,
-                "temperature": args.temperature,
                 "max_tokens": args.max_tokens,
+                "temperature": args.temperature,
                 "top_p": args.top_p,
                 "frequency_penalty": args.frequency_penalty,
                 "presence_penalty": args.presence_penalty,
@@ -46,6 +46,11 @@ class OpenAIRunner(BaseRunner):
                 messages=payload,  # type: ignore
                 **self.client_kwargs,
             )
+        except openai.BadRequestError as e:
+            return [
+                f"OpenAI BadRequestError: {e}"
+                for _ in range(self.client_kwargs.get("n", 1))
+            ]
         except (
             openai.APIError,
             openai.RateLimitError,

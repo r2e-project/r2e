@@ -54,7 +54,7 @@ def run_func_in_process(
         The result of executing the function.
     """
     mode = "spawn" if _use_spawn else "fork"
-    c_func = concurrent.process(timeout=_timeout, context=mp.get_context(mode))(func)
+    c_func = concurrent.process(timeout=_timeout, context=mp.get_context(mode))(func) # type: ignore
     future = c_func(*args, **kwargs)
 
     try:

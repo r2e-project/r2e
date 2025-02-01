@@ -8,6 +8,7 @@ def generate_docs():
     # Generate Table of Contents
     output += "## Summary:\n\n"
     for command in r2e.commands.values():
+        assert command.name is not None, "Command name must be defined"
         output += (
             f"- [r2e {command.name}](#r2e-{command.name.lower()}): {command.help}\n"
         )
@@ -15,11 +16,11 @@ def generate_docs():
 
     for command in r2e.commands.values():
         output += f"## `r2e {command.name}`\n\n"
-        output += f"{command.help}\n\n"
+        output += f"{command.help}\n\n" # type: ignore
         output += "### Options:\n\n"
 
         for param in command.params:
-            output += f"- `--{param.name}`: {param.help}"
+            output += f"- `--{param.name}`: {param.help}" # type: ignore
             if param.default:
                 output += f" (default: {param.default})"
             output += "\n"

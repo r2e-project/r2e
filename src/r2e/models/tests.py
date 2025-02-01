@@ -86,7 +86,7 @@ class TestHistory(BaseModel):
         return "\n".join(last_errors)
 
     @property
-    def latest_chat_messages(self) -> list[dict[str, str]]:
+    def latest_chat_messages(self) -> list[dict[str, str]] | None:
         """Returns the chat messages of the latest test run"""
         return self.history[-1].chat_messages
 

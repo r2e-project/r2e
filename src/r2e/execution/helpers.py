@@ -149,11 +149,11 @@ def check_equiv(
         return False, repr(e), fut
 
     try:
-        fut = [fut]
+        fut = [fut] # type: ignore
         service = conn.root
         assert service is not None, "Test service is None"
 
-        repo_data, fut_data, test_data = get_fut_data(fut, local=local)
+        repo_data, fut_data, test_data = get_fut_data(fut, local=local) # type: ignore
         service.setup_repo(repo_data)
         service.setup_function(fut_data)
         service.setup_test(test_data)
