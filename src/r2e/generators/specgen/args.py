@@ -3,7 +3,7 @@ from pydantic import Field
 
 
 class SpecGenArgs(LLMArgs):
-    in_file: str = Field(
+    in_file: str | None = Field(
         None,
         description="The input file for the spec generator",
     )

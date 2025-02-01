@@ -46,10 +46,11 @@ class BaseRunner(ABC):
         if cache is not None:
             cache_result = cache.get_from_cache(json.dumps([payload, config]))
             if cache_result is not None:
-                return cache_result
+                return cache_result # type: ignore
 
         result = call_method(payload)
-        assert len(result) == args.n
+        if 'o1' not in args.model_name:
+            assert len(result) == args.n
 
         return result
 

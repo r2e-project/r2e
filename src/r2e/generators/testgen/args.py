@@ -17,12 +17,12 @@ class TestGenArgs(LLMArgs):
         description="The maximum context size",
     )
 
-    in_file: str = Field(
+    in_file: str | None = Field(
         None,
         description="The input file for the test generator",
     )
 
-    function: str = Field(
+    function: str | None = Field(
         None,
         description="A specific function to generate tests for",
     )

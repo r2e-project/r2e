@@ -1,8 +1,8 @@
-[tool.poetry]
+[project]
 name = "r2e"
 version = "0.1.0"
+requires-python = ">=3.11"
 description = ""
-authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -45,5 +45,13 @@ optional = true
 vllm = "^0.4.1"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+r2e = "r2e.cli:r2e"
+
+[project.optional-dependencies]
+vllm = [
+    "vllm>=0.6.3.post1",
+]
