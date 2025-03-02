@@ -49,9 +49,6 @@ class BaseRunner(ABC):
                 return cache_result
 
         result = call_method(payload)
-        if 'o1' not in args.model_name:
-            assert len(result) == args.n
-
         return result
 
     def run_batch(self, payloads: list) -> list[list[str]]:
