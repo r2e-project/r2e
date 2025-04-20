@@ -18,7 +18,7 @@ class OpenAIRunner(BaseRunner):
 
     def __init__(self, args: LLMArgs, model: LanguageModel):
         super().__init__(args, model)
-        if "o1" in args.model_name or "o3" in args.model_name:
+        if "o1" in args.model_name or "o3" in args.model_name or "o4" in args.model_name:
             self.client_kwargs: dict[str, Any] = {
                 "model": args.model_name,
                 "max_completion_tokens": args.max_tokens,
