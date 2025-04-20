@@ -105,4 +105,12 @@ LanguageModelList: list[LanguageModel] = [
         model_name="o3-mini",
         style=LanguageModelStyle.OpenAI,
     ),
+    LanguageModel(
+        model_name="o3",
+        style=LanguageModelStyle.OpenAI,
+    ),
+    LanguageModel(
+        model_name="o4-mini",
+        style=LanguageModelStyle.OpenAI,
+    ),
 ]
